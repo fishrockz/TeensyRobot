@@ -260,11 +260,44 @@ void loop() {
 		}
 	} else if (WeaponState == 5){
 		 // this is charging,
-	
+		if (TransitionTo!=6){
+			TransitionTo=6;//armed
+			TransitionStart=micros();
+			TransitionFrom= 5;
+		}else if (micros()<TransitionStart+ValveDclosingTime){
+			digitalWrite(ValveAPin,0); // Comand close everything
+			digitalWrite(ValveBPin,0);
+			digitalWrite(ValveCPin,0);
+			digitalWrite(ValveDPin,0);
+			digitalWrite(ValveEPin,0); 
+		
+		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000){
+			// this is baicly only open long enught to open the value up a bit
+			// Tune ME please!!
 
-		int syntax =0 ;
-	
+			digitalWrite(ValveAPin,1); 
+			digitalWrite(ValveBPin,0);
+			digitalWrite(ValveCPin,0);
+			digitalWrite(ValveDPin,0);
+			digitalWrite(ValveEPin,0);
 
+		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000+ValveAclosingTime){
+		
+			digitalWrite(ValveAPin,0); 
+			digitalWrite(ValveBPin,0);
+			digitalWrite(ValveCPin,0);
+			digitalWrite(ValveDPin,0);
+			digitalWrite(ValveEPin,0);
+		} else {
+			// this is baicly only open long enught to open the value up a bit
+			// Tune ME please!!
+			// we are now armed and ready to fire!
+			WeaponState=6;
+		
+		}
+	} else if (WeaponState == 6){	
+	
+		
 	
 	}else{
 		Serial.println("WeaponState error!!");
