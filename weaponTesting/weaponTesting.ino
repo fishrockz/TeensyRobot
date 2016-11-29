@@ -25,7 +25,7 @@ PulsePositionInput RadioIn;
 File file;
 
 
-int WeaponState;
+int WeaponState=-1;
 // WeaponStates
 // -2	 == Full DUMP
 // -1	 == non inishalised (	Inishaliseing part A )
@@ -47,7 +47,8 @@ int TransitionFrom = -99; // -99 can be the past
 unsigned long TransitionStart;// 70 miniutes till micros overflows
 unsigned long TransitionTimer1;
 
-
+unsigned long HartBeatTimer;
+int HaertBeat = -1;
 
 int ValveAopeningTime=10000;
 int ValveAclosingTime=10000;
@@ -63,31 +64,31 @@ int ValveEclosingTime=10000;
 
 
 void setup() {
-	
-//Safety shit first
-//Safety shit first
+
+	//Safety shit first
+	//Safety shit first
 
 
 
-pinMode(ValveAPin,OUTPUT); 
-pinMode(ValveBPin,OUTPUT); 
-pinMode(ValveCPin,OUTPUT); 
-pinMode(ValveDPin,OUTPUT); 
-pinMode(ValveEPin,OUTPUT); 
+	pinMode(ValveAPin,OUTPUT); 
+	pinMode(ValveBPin,OUTPUT); 
+	pinMode(ValveCPin,OUTPUT); 
+	pinMode(ValveDPin,OUTPUT); 
+	pinMode(ValveEPin,OUTPUT); 
 
-digitalWrite(ValveAPin,0); // this should be true anyway.
-digitalWrite(ValveBPin,0);
-digitalWrite(ValveCPin,0);
-digitalWrite(ValveDPin,0);
-digitalWrite(ValveEPin,1);	// it would be cool to make sure A is shut
-// but we would be waiting for ages in micro turms.
-// so if there is a dogy power line cousing constant resets i would like to atleast be pwming some power into valve E
+	digitalWrite(ValveAPin,0); // this should be true anyway.
+	digitalWrite(ValveBPin,0);
+	digitalWrite(ValveCPin,0);
+	digitalWrite(ValveDPin,0);
+	digitalWrite(ValveEPin,1);	// it would be cool to make sure A is shut
+	// but we would be waiting for ages in micro turms.
+	// so if there is a dogy power line cousing constant resets i would like to atleast be pwming some power into valve E
 
 
 
-pinMode(boardLEDPin,OUTPUT);
+	pinMode(boardLEDPin,OUTPUT);
 
-RadioIn.begin(PPMPin);
+	RadioIn.begin(PPMPin);
 
 
 	WeaponState=-1;
@@ -99,7 +100,10 @@ int count;
 
 
 void loop() {
-//Serial.println("hi ");
+
+Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);;Serial.println();
+
+
 	if (WeaponState>=4){
 		int num = RadioIn.available();
 		if (num == 8) {
@@ -125,57 +129,57 @@ void loop() {
 		}
 	}
 
-	if (WeaponState==-1){
+	if (WeaponState==-1) {
 //we have just turned on! we probaly dont have any ppm data yet
 // Setup should have made use safe but we dont want to do anything silly 
 
 
 // transition to INIT/safe.
 // we need to put some air in the recoil chamber so it can be reged down to the corect amount
-
-		if (TransitionTo !=1){
+		Serial.println("hi -1");
+		if (TransitionTo !=1) {
 			TransitionTo = 1;
 			TransitionStart=micros();
 			TransitionFrom= -1;
 		
-		} else if (micros()<TransitionStart+ValveEopeningTime+100000){
+		} else if (micros()<TransitionStart+ValveEopeningTime+100000) {
 			digitalWrite(ValveAPin,0); 
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,0);
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,1);
-		} else if(micros()<TransitionStart+ValveEopeningTime+100000+ValveEclosingTime){
+		} else if (micros()<TransitionStart+ValveEopeningTime+100000+ValveEclosingTime) {
 			digitalWrite(ValveAPin,0); 
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,0);
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,0);
 	
-		} else if (micros()>TransitionStart+ValveEopeningTime+100000+ValveEclosingTime){ 
+		} else if (micros()>TransitionStart+ValveEopeningTime+100000+ValveEclosingTime) { 
 
 			WeaponState=1;
 		}
-	} else if (WeaponState == 1){
+	} else if (WeaponState == 1) {
 //InishaliseingA == 1;
 // setting the presser in the recoil chamber to presuered
 
-	
+		Serial.println("hi 1");
  
 	// this is a transient state
 	// it always trnaisitont to 2 and starts to transistion strait way
-		if (TransitionTo !=2){
+		if (TransitionTo != 2) {
 			TransitionTo = 2;
 			TransitionStart=micros();
 			TransitionFrom= 1;
 
-		} else if (micros()<TransitionStart+ValveCopeningTime){
+		} else if (micros()<TransitionStart+ValveCopeningTime) {
 			digitalWrite(ValveAPin,0); // Comand Open
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,1);
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,0); 
 		
-		} else if (micros()>TransitionStart+ValveCopeningTime){
+		} else if (micros()>TransitionStart+ValveCopeningTime) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
@@ -188,34 +192,34 @@ void loop() {
 			digitalWrite(ValveEPin,0);
 
 		
-		} else if (micros()>TransitionStart+ValveCopeningTime+ValveCclosingTime){
+		} else if (micros()>TransitionStart+ValveCopeningTime+ValveCclosingTime) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 	
 			WeaponState=2;
 		}	
 
-	} else if (WeaponState == 2){
+	} else if (WeaponState == 2) {
 //InishaliseingA == 1;
 // setting the presser in the recoil chamber to presuered
-
+		Serial.println("hi 2");
 	
  
 		// this is a transient state
 		// it always trnaisitont to 2 and starts to transistion strait way
-		if (TransitionTo !=3){
+		if (TransitionTo !=3) {
 			TransitionTo = 3;
 			TransitionStart=micros();
 			TransitionFrom= 2;
 
-		} else if (micros()<TransitionStart+ValveDopeningTime){
+		} else if (micros()<TransitionStart+ValveDopeningTime) {
 			digitalWrite(ValveAPin,0); // Comand Open
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,0);
 			digitalWrite(ValveDPin,1);
 			digitalWrite(ValveEPin,0); 
 		
-		} else if (micros()>TransitionStart+ValveDopeningTime){
+		} else if (micros()>TransitionStart+ValveDopeningTime) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
@@ -228,7 +232,7 @@ void loop() {
 			digitalWrite(ValveEPin,0);
 
 		
-		} else if (micros()>TransitionStart+ValveDopeningTime+ValveDclosingTime){
+		} else if (micros()>TransitionStart+ValveDopeningTime+ValveDclosingTime) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 	
@@ -236,42 +240,54 @@ void loop() {
 		
 		}
 
-	} else if (WeaponState == 4){
+	} else if (WeaponState == 4) {
 		 //Disarmed! 
 		 // This is a safe mode, so gose straight to open E
-		 // there for close A and B if 
-		if (TransitionTo==5){
+		 // there for close A and B if
+		 
+		if (micros()>HartBeatTimer+10^6){
+			HartBeatTimer=micros();
+			if (HaertBeat<1){
+				HaertBeat=1;
+				digitalWrite(boardLEDPin,1);
+			}else{
+				HaertBeat=0;
+				digitalWrite(boardLEDPin,1);
+			}
+		}
+		
+		if (TransitionTo==5) {
 			// if we are disarmed then we are disarmed others should close E first
 			// we could transisitio out by closing E but then we would have left fully Safe state.
 			WeaponState=5;
 	
-		}else{
+		} else {
 			digitalWrite(ValveAPin,0); 
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,0);
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,1);
-			if (NewComandState==5){
+			if (NewComandState==5) {
 				TransitionTo=5;
 				TransitionStart=micros();
 				TransitionFrom= 4;
 		
 			}
 		}
-	} else if (WeaponState == 5){
+	} else if (WeaponState == 5) {
 		 // this is charging,
-		if (TransitionTo!=6){
+		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
 			TransitionStart=micros();
 			TransitionFrom= 5;
-		}else if (micros()<TransitionStart+ValveDclosingTime){
+		}else if (micros()<TransitionStart+ValveEclosingTime) {
 			digitalWrite(ValveAPin,0); // Comand close everything
 			digitalWrite(ValveBPin,0);
 			digitalWrite(ValveCPin,0);
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,0); 
 		
-		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000){
+		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
@@ -281,7 +297,7 @@ void loop() {
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,0);
 
-		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000+ValveAclosingTime){
+		} else if (micros()<TransitionStart+ValveEclosingTime+ValveAopeningTime+100000+ValveAclosingTime) {
 		
 			digitalWrite(ValveAPin,0); 
 			digitalWrite(ValveBPin,0);
@@ -289,17 +305,66 @@ void loop() {
 			digitalWrite(ValveDPin,0);
 			digitalWrite(ValveEPin,0);
 		} else {
-			// this is baicly only open long enught to open the value up a bit
-			// Tune ME please!!
 			// we are now armed and ready to fire!
 			WeaponState=6;
 		
 		}
 	} else if (WeaponState == 6){	
+		if (NewComandState==8){//aim for a single simple fire.
+			TransitionTo=7;// first stop is fireing
+			TransitionStart=micros();
+			TransitionFrom= 6;
+		} else if (NewComandState==9){//aim for a single fire with power return.
+			TransitionTo=7;// first stop is fireing
+			TransitionStart=micros();
+			TransitionFrom= 6;
+		}
+	} else if (WeaponState == 7){
 	
+	//big bang!!
+		if ((TransitionTo != 8) and (TransitionTo != 9)){
+			if (NewComandState==8){//aim for a single simple fire.
+				TransitionTo=8;// first stop is fireing
+				TransitionStart=micros();
+				TransitionFrom= 7;
+			} else if (NewComandState==9){//aim for a single fire with power return.
+				TransitionTo=9;// first stop is fireing
+				TransitionStart=micros();
+				TransitionFrom= 7;
+			}
+	    	}//no need for a else if as may now be true
+	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
+	    		if (micros()<TransitionStart+ValveBopeningTime+1000){
+	    		
+				digitalWrite(ValveAPin,0); 
+				digitalWrite(ValveBPin,1);
+				digitalWrite(ValveCPin,0);
+				digitalWrite(ValveDPin,0);
+				digitalWrite(ValveEPin,0);
+	    		}else if (micros()<TransitionStart+ValveBopeningTime+1000+ValveBclosingTime){
+	    		
+				digitalWrite(ValveAPin,0); 
+				digitalWrite(ValveBPin,0);
+				digitalWrite(ValveCPin,0);
+				digitalWrite(ValveDPin,0);
+				digitalWrite(ValveEPin,0);
+	    		}else{
+	    			WeaponState=TransitionTo;
+	    		}
+	    	}
+	} else if (WeaponState == 8){
+		// soft return
+		// back to Charging so we can be armed again.
 		
-	
-	}else{
+		
+		
+	} else if (WeaponState == 9){  
+		// power return	
+		// back to Charging so we can be armed again.
+		
+		
+		
+	} else {
 		Serial.println("WeaponState error!!");
 		Serial.print("WeaponState: ");Serial.print(WeaponState);
 		Serial.println();
