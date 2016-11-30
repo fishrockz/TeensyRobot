@@ -88,12 +88,12 @@ void setup() {
 
 
 	pinMode(boardLEDPin,OUTPUT);
-	Seloind(boardLEDPin,LOW);
+	digitalWrite(boardLEDPin,LOW);
 	RadioIn.begin(PPMPin);
 
 
-	WeaponState=-1;
-	TransitionTo=-1;
+	WeaponState=4;
+	TransitionTo=4;
 }
 
 
@@ -105,7 +105,7 @@ void loop() {
 Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
 
 
-	if (WeaponState>=4){
+	if (micros()> 100000){//dont do anything but be safe for the first 10th of a second
 		int num = RadioIn.available();
 		if (num == 8) {
 
@@ -238,11 +238,12 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 
 		
 		} else if (micros()>TransitionStart+ValveDopeningTime+ValveDclosingTime) {
-			// this is baicly only open long enught to open the value up a bit
-			// Tune ME please!!
-	
-			WeaponState=4;
-		
+			// at this point we have done a init, this might just be because of a comand to init or because we are in the arming process
+			if (NewComandState==6){
+				WeaponState=5;
+			}else{
+				WeaponState=4;
+			}
 		}
 
 	} else if (WeaponState == 4) {
@@ -250,37 +251,45 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		 // This is a safe mode, so gose straight to open E
 		 // there for close A and B if
 		 
+		Seloind(ValveAPin,LOW); 
+		Seloind(ValveBPin,LOW);
+		Seloind(ValveCPin,LOW);
+		Seloind(ValveDPin,HIGH);
+		Seloind(ValveEPin,HIGH)	;
+			 
 		if (micros()>HartBeatTimer+1000000){
 			HartBeatTimer=micros();
 			Serial.print("LED -- FLASH      **");
 			if (HaertBeat<1){
 				HaertBeat=1;
-				Seloind(boardLEDPin,1);
+				digitalWrite(boardLEDPin,1);
 			}else{
 				HaertBeat=0;
-				Seloind(boardLEDPin,0);
+				digitalWrite(boardLEDPin,0);
 			}
 		}
 		
-		if (TransitionTo==5) {
-			// if we are disarmed then we are disarmed others should close E first
-			// we could transisitio out by closing E but then we would have left fully Safe state.
-			WeaponState=5;
-	
+		if (TransitionTo == -1) {
+			// I dont want some one to beable to undo armed but leave the init switch up and then the robot to init straght away.
+			if (NewComandState != -1){
+				TransitionTo=4;
+			}else if (micros()>TransitionStart+100000){
+				digitalWrite(boardLEDPin,0);
+				WeaponState=-1;
+			}
 		} else {
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,HIGH);
-			Seloind(ValveEPin,HIGH);
-			if (NewComandState==5) {
-				TransitionTo=5;
+			if (NewComandState==6) {
+				digitalWrite(boardLEDPin,0);
+				WeaponState=-1;
+				TransitionStart=micros();
+				TransitionTo=-1;
+			} else if ((NewComandState==-1) and (TransitionTo!=-1)) {
+				TransitionTo=-1;
 				TransitionStart=micros();
 				TransitionFrom= 4;
-		
 			}
 		}
-		Seloind(boardLEDPin,0);
+
 	} else if (WeaponState == 5) {
 		 // this is charging,
 		if (TransitionTo!=6) {
@@ -295,7 +304,6 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			Seloind(ValveEPin,LOW); 
 		
 		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000) {
-			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
 			Seloind(ValveAPin,HIGH); 
@@ -304,19 +312,20 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW);
 
-		} else if (micros()<TransitionStart+ValveEclosingTime+ValveAopeningTime+100000+ValveAclosingTime) {
-		
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW);
 		} else {
 			// we are now armed and ready to fire!
 			WeaponState=6;
 		
 		}
-	} else if (WeaponState == 6){	
+	} else if (WeaponState == 6){
+		//At this point we just sit and wait
+		
+		Seloind(ValveAPin,HIGH); 
+		Seloind(ValveBPin,LOW);
+		Seloind(ValveCPin,LOW);
+		Seloind(ValveDPin,LOW);
+		Seloind(ValveEPin,LOW);
+		
 		if (NewComandState==8){//aim for a single simple fire.
 			TransitionTo=7;// first stop is fireing
 			TransitionStart=micros();
@@ -341,20 +350,21 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			}
 	    	}//no need for a else if as may now be true
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
-	    		if (micros()<TransitionStart+ValveBopeningTime+1000){
+	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
+		    		Seloind(ValveAPin,LOW); 
+				Seloind(ValveBPin,LOW);
+				Seloind(ValveCPin,LOW);
+				Seloind(ValveDPin,LOW);
+				Seloind(ValveEPin,LOW)
+	    		
+	    		else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+1000){
 				Seloind(ValveAPin,LOW); 
 				Seloind(ValveBPin,HIGH);
 				Seloind(ValveCPin,LOW);
 				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,LOW);
-	    		}else if (micros()<TransitionStart+ValveBopeningTime+1000+ValveBclosingTime){
-	    		
-				Seloind(ValveAPin,LOW );
-				Seloind(ValveBPin,LOW);
-				Seloind(ValveCPin,LOW);
-				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,LOW);
+				Seloind(ValveEPin,HIGH);
+				// all return states want these values open
 	    		}else{
 	    			WeaponState=TransitionTo;
 	    		}
@@ -362,6 +372,27 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 	} else if (WeaponState == 8){
 		// soft return
 		// back to Charging so we can be armed again.
+		
+		
+		
+		if (TransitionTo != 5) {
+			Serial.print("hi a");
+			TransitionTo = 2;
+			TransitionStart=micros();
+			TransitionFrom= 1;
+
+		} else if (micros()<TransitionStart+1000){
+			Seloind(ValveAPin,LOW);
+			Seloind(ValveBPin,HIGH);
+			Seloind(ValveCPin,LOW);
+			Seloind(ValveDPin,LOW);
+			Seloind(ValveEPin,HIGH);
+		}else{
+		WeaponState = 5;
+		TransitionTo=6;
+		
+		}
+		
 		
 		
 		
@@ -375,7 +406,13 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		Serial.println("WeaponState error!!");
 		Serial.print("WeaponState: ");Serial.print(WeaponState);
 		Serial.println();
-	
+		
+		// default to disarmed (4)
+		Seloind(ValveAPin,LOW); 
+		Seloind(ValveBPin,LOW);
+		Seloind(ValveCPin,LOW);
+		Seloind(ValveDPin,HIGH);
+		Seloind(ValveEPin,HIGH)	;
 	}
 }
 
