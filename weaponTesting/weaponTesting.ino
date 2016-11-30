@@ -40,7 +40,7 @@ int WeaponState=-1;
 // 9		== Power Return
 // 10	 == Buffer Vent
 
-int NewComandState=-1;
+int NewComandState=4;
 int TransitionTo;
 int TransitionFrom = -99; // -99 can be the past
 
@@ -94,6 +94,7 @@ void setup() {
 
 	WeaponState=4;
 	TransitionTo=4;
+	NewComandState=4;
 }
 
 
@@ -102,7 +103,7 @@ int count;
 
 void loop() {
 
-Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
+//Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
 
 
 	if (micros()> 100000){//dont do anything but be safe for the first 10th of a second
@@ -110,16 +111,16 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		if (num == 8) {
 
 			float valArm = RadioIn.read(5);
-			Serial.println(valArm);
+			//Serial.println(valArm);
 			if (valArm<1800){
 				WeaponState=4;
 				NewComandState=4;
 				TransitionTo=4;
 			}else {// We Are Armed
 				float valF = RadioIn.read(6);
-				Serial.println(valF);
+				//Serial.println(valF);
 				if (valF<1450){
-				NewComandState=5;// not fireing so Ask to transitiont to Armed when availale
+					NewComandState=6;// not fireing so Ask to transitiont to Armed when availale
 				}else if (valF<1800) {
 					if (WeaponState==6){
 						NewComandState=8;// Ask for single Firing/free return
@@ -132,7 +133,7 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			}
 		}
 	}
-Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
+//Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
 	if (WeaponState==-1) {
 //we have just turned on! we probaly dont have any ppm data yet
 // Setup should have made use safe but we dont want to do anything silly 
@@ -140,12 +141,12 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 
 // transition to INIT/safe.
 // we need to put some air in the recoil chamber so it can be reged down to the corect amount
-		Serial.print("hi -1");Serial.print("hi -1");Serial.println();
+		//Serial.print("hi -1");Serial.print("hi -1");Serial.println();
 		if (TransitionTo !=1) {
 			TransitionTo = 1;
 			TransitionStart=micros();
 			TransitionFrom= -1;
-		
+			Serial.println("Start Init");
 		} else if (micros()<TransitionStart+ValveEopeningTime+100000) {
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
@@ -167,23 +168,22 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 //InishaliseingA == 1;
 // setting the presser in the recoil chamber to presuered
 
-		Serial.print("hi 1");Serial.println(TransitionStart);
+		//Serial.print("hi 1");Serial.println(TransitionStart);
  
 	// this is a transient state
 	// it always trnaisitont to 2 and starts to transistion strait way
 		if (TransitionTo != 2) {
-			Serial.print("hi a");
 			TransitionTo = 2;
 			TransitionStart=micros();
 			TransitionFrom= 1;
-
+			Serial.println("Start Init 1");
 		} else if (micros()<TransitionStart+ValveCopeningTime) {
 			Seloind(ValveAPin,LOW); // Comand Open
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,HIGH);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW); 
-			Serial.print("hi b");
+
 		} else if ((micros()>TransitionStart+ValveCopeningTime) and (micros()<TransitionStart+ValveCopeningTime+ValveCclosingTime) ){
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
@@ -195,19 +195,18 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW);
-			Serial.print("hi c");
+
 		
 		} else  {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
-			Serial.print("hi d");
 			WeaponState=2;
 		}
 
 	} else if (WeaponState == 2) {
 //InishaliseingA == 1;
 // setting the presser in the recoil chamber to presuered
-		Serial.println("hi 2");
+
 	
  
 		// this is a transient state
@@ -216,7 +215,7 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			TransitionTo = 3;
 			TransitionStart=micros();
 			TransitionFrom= 2;
-
+			Serial.println("Start Init 2");
 		} else if (micros()<TransitionStart+ValveDopeningTime) {
 			Seloind(ValveAPin,LOW); // Comand Open
 			Seloind(ValveBPin,LOW);
@@ -259,7 +258,9 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			 
 		if (micros()>HartBeatTimer+1000000){
 			HartBeatTimer=micros();
-			Serial.print("LED -- FLASH      **");
+			Serial.print("LED -- FLASH      ** ");
+			Serial.print(NewComandState);
+			Serial.println(" Dis Arm Haert Beat");
 			if (HaertBeat<1){
 				HaertBeat=1;
 				digitalWrite(boardLEDPin,1);
@@ -296,7 +297,9 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 			TransitionTo=6;//armed
 			TransitionStart=micros();
 			TransitionFrom= 5;
+			Serial.println("Start charging");
 		}else if (micros()<TransitionStart+ValveEclosingTime) {
+			// be could be open too
 			Seloind(ValveAPin,LOW); // Comand close everything
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
@@ -315,6 +318,7 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		} else {
 			// we are now armed and ready to fire!
 			WeaponState=6;
+			Serial.println("Armed");
 		
 		}
 	} else if (WeaponState == 6){
@@ -328,10 +332,13 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		
 		if (NewComandState==8){//aim for a single simple fire.
 			TransitionTo=7;// first stop is fireing
+			WeaponState=7;
 			TransitionStart=micros();
 			TransitionFrom= 6;
+			Serial.println("Start Fire");
 		} else if (NewComandState==9){//aim for a single fire with power return.
 			TransitionTo=7;// first stop is fireing
+			WeaponState=7;
 			TransitionStart=micros();
 			TransitionFrom= 6;
 		}
@@ -343,6 +350,7 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 				TransitionTo=8;// first stop is fireing
 				TransitionStart=micros();
 				TransitionFrom= 7;
+				
 			} else if (NewComandState==9){//aim for a single fire with power return.
 				TransitionTo=9;// first stop is fireing
 				TransitionStart=micros();
@@ -356,9 +364,9 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 				Seloind(ValveBPin,LOW);
 				Seloind(ValveCPin,LOW);
 				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,LOW)
+				Seloind(ValveEPin,LOW);
 	    		
-	    		else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+1000){
+	    		} else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+1000){
 				Seloind(ValveAPin,LOW); 
 				Seloind(ValveBPin,HIGH);
 				Seloind(ValveCPin,LOW);
@@ -375,22 +383,21 @@ Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.pri
 		
 		
 		
-		if (TransitionTo != 5) {
-			Serial.print("hi a");
-			TransitionTo = 2;
-			TransitionStart=micros();
-			TransitionFrom= 1;
+		if (NewComandState == 6) {
+			if (TransitionTo != 5){
+				TransitionTo = 5;
+				TransitionStart=micros();
+				TransitionFrom= 1;
+			}else if (micros() > TransitionStart+10000) {
+				WeaponState = 5;
+			}
 
-		} else if (micros()<TransitionStart+1000){
+		} else {
 			Seloind(ValveAPin,LOW);
 			Seloind(ValveBPin,HIGH);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,HIGH);
-		}else{
-		WeaponState = 5;
-		TransitionTo=6;
-		
 		}
 		
 		
