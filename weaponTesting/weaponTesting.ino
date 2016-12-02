@@ -10,11 +10,11 @@ const uint32_t FILE_SIZE = 256UL*BUF_DIM;
 const uint32_t PPMPin = 10;//only serten pins work, eg, 10 on teensey 3.1
 const uint32_t boardLEDPin = 13;
 
-const uint32_t ValveAPin = 3;
-const uint32_t ValveBPin = 4;
-const uint32_t ValveCPin = 5;
-const uint32_t ValveDPin = 6;
-const uint32_t ValveEPin = 7;
+const uint32_t ValveAPin = 4;
+const uint32_t ValveBPin = 5;
+const uint32_t ValveCPin = 6;
+const uint32_t ValveDPin = 7;
+const uint32_t ValveEPin = 8;
 
 
 
