@@ -10,11 +10,11 @@ const uint32_t FILE_SIZE = 256UL*BUF_DIM;
 const uint32_t PPMPin = 10;//only serten pins work, eg, 10 on teensey 3.1
 const uint32_t boardLEDPin = 13;
 
-const uint32_t ValveAPin = 4;
-const uint32_t ValveBPin = 5;
-const uint32_t ValveCPin = 6;
-const uint32_t ValveDPin = 7;
-const uint32_t ValveEPin = 8;
+const uint32_t ValveAPin = 4;// main fill port
+const uint32_t ValveBPin = 5;// main exsorsed / fire
+const uint32_t ValveCPin = 6;// retract fill
+const uint32_t ValveDPin = 7;//retranct vent/exhaust
+const uint32_t ValveEPin = 8;// side exsorsed.
 
 
 
@@ -169,7 +169,7 @@ void loop() {
 // setting the presser in the recoil chamber to presuered
 
 		//Serial.print("hi 1");Serial.println(TransitionStart);
- 
+ 		int retractfilltime = 1000000;
 	// this is a transient state
 	// it always trnaisitont to 2 and starts to transistion strait way
 		if (TransitionTo != 2) {
@@ -177,14 +177,14 @@ void loop() {
 			TransitionStart=micros();
 			TransitionFrom= 1;
 			Serial.println("Start Init 1");
-		} else if (micros()<TransitionStart+ValveCopeningTime) {
+		} else if (micros()<TransitionStart+ValveCopeningTime+retractfilltime) {
 			Seloind(ValveAPin,LOW); // Comand Open
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,HIGH);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW); 
 
-		} else if ((micros()>TransitionStart+ValveCopeningTime) and (micros()<TransitionStart+ValveCopeningTime+ValveCclosingTime) ){
+		} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime) ){
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
@@ -205,10 +205,10 @@ void loop() {
 
 	} else if (WeaponState == 2) {
 //InishaliseingA == 1;
-// setting the presser in the recoil chamber to presuered
+// setting the presser in the recoil chamber to metered presuered at 0.3 bar
 
 	
- 
+		int retractemptytime = 2000000;
 		// this is a transient state
 		// it always trnaisitont to 2 and starts to transistion strait way
 		if (TransitionTo !=3) {
@@ -216,14 +216,14 @@ void loop() {
 			TransitionStart=micros();
 			TransitionFrom= 2;
 			Serial.println("Start Init 2");
-		} else if (micros()<TransitionStart+ValveDopeningTime) {
+		} else if (micros()<TransitionStart+ValveDopeningTime+retractemptytime) {
 			Seloind(ValveAPin,LOW); // Comand Open
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,HIGH);
 			Seloind(ValveEPin,LOW); 
 		
-		} else if ((micros()>TransitionStart+ValveDopeningTime) and (micros()<TransitionStart+ValveDopeningTime+ValveDclosingTime)) {
+		} else if ((micros()>TransitionStart+ValveDopeningTime+retractemptytime) and (micros()<TransitionStart+ValveDopeningTime+retractemptytime+ValveDclosingTime)) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
