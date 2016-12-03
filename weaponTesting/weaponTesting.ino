@@ -121,7 +121,7 @@ void loop() {
 				//Serial.println(valF);
 				if (valF<1450){
 					NewComandState=6;// not fireing so Ask to transitiont to Armed when availale
-				}else if (valF<1800) {
+				}else if (valF>1800) {
 					if (WeaponState==6){
 						NewComandState=8;// Ask for single Firing/free return
 						
