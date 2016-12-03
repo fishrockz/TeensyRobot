@@ -1,11 +1,11 @@
-#include <SPI.h>
-#include "SdFat.h"
+//#include <SPI.h>
+//#include "SdFat.h"
 #include <PulsePosition.h>
 // 32 KiB buffer.
-const size_t BUF_DIM = 32768;
+//const size_t BUF_DIM = 32768;
 
 // 8 MiB file.
-const uint32_t FILE_SIZE = 256UL*BUF_DIM;
+//const uint32_t FILE_SIZE = 256UL*BUF_DIM;
 
 const uint32_t PPMPin = 10;//only serten pins work, eg, 10 on teensey 3.1
 const uint32_t boardLEDPin = 13;
@@ -22,7 +22,7 @@ const uint32_t ValveEPin = 8;// side exsorsed.
 PulsePositionInput RadioIn;
 //SdFatSdioEX sd;
 
-File file;
+//File file;
 
 
 int WeaponState=-1;
@@ -50,16 +50,16 @@ unsigned long TransitionTimer1;
 unsigned long HartBeatTimer;
 int HaertBeat = -1;
 
-int ValveAopeningTime=10000;
-int ValveAclosingTime=10000;
-int ValveBopeningTime=10000;
-int ValveBclosingTime=10000;
-int ValveCopeningTime=10000;
-int ValveCclosingTime=10000;
-int ValveDopeningTime=10000;
-int ValveDclosingTime=10000;
-int ValveEopeningTime=10000;
-int ValveEclosingTime=10000;
+int ValveAopeningTime=100000;
+int ValveAclosingTime=100000;
+int ValveBopeningTime=100000;
+int ValveBclosingTime=100000;
+int ValveCopeningTime=100000;
+int ValveCclosingTime=100000;
+int ValveDopeningTime=100000;
+int ValveDclosingTime=100000;
+int ValveEopeningTime=100000;
+int ValveEclosingTime=100000;
 
 void Seloind(int pin,int state){
 	digitalWrite(pin, state!=1);
@@ -357,6 +357,8 @@ void loop() {
 				TransitionFrom= 7;
 			}
 	    	}//no need for a else if as may now be true
+	    	
+	    	
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
@@ -381,14 +383,14 @@ void loop() {
 		// soft return
 		// back to Charging so we can be armed again.
 		
-		
+		int RetractTime = 1000000;
 		
 		if (NewComandState == 6) {
 			if (TransitionTo != 5){
 				TransitionTo = 5;
 				TransitionStart=micros();
 				TransitionFrom= 1;
-			}else if (micros() > TransitionStart+10000) {
+			}else if (micros() > TransitionStart+RetractTime) {
 				WeaponState = 5;
 			}
 
