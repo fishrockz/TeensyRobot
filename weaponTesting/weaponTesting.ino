@@ -27,8 +27,8 @@ PulsePositionInput RadioIn;
 
 int WeaponState=-1;
 // WeaponStates
-// -2	 == Full DUMP
-// -1	 == non inishalised (	Inishaliseing part A )
+// -2	 	== Full DUMP
+// -1	 	== non inishalised (	Inishaliseing part A )
 // 1		== InishaliseingA
 // 2		== InishaliseingB
 
@@ -38,7 +38,7 @@ int WeaponState=-1;
 // 7		== Firing
 // 8		== Free	Return
 // 9		== Power Return
-// 10	 == Buffer Vent
+// 10		== Buffer Vent
 
 int NewComandState=4;
 int TransitionTo;
@@ -135,43 +135,39 @@ void loop() {
 	}
 //Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
 	if (WeaponState==-1) {
-//we have just turned on! we probaly dont have any ppm data yet
-// Setup should have made use safe but we dont want to do anything silly 
+		// start of the retraction sequence
+		// first vent
 
-
-// transition to INIT/safe.
-// we need to put some air in the recoil chamber so it can be reged down to the corect amount
-		//Serial.print("hi -1");Serial.print("hi -1");Serial.println();
+		int ExhaustTime = 100000;
 		if (TransitionTo !=1) {
 			TransitionTo = 1;
 			TransitionStart=micros();
 			TransitionFrom= -1;
 			Serial.println("Start Init");
-		} else if (micros()<TransitionStart+ValveEopeningTime+100000) {
+		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime) {
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,1);
-		} else if (micros()<TransitionStart+ValveEopeningTime+100000+ValveEclosingTime) {
+		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime) {
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW);
 	
-		} else if (micros()>TransitionStart+ValveEopeningTime+100000+ValveEclosingTime) { 
+		} else if (micros()>TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime) { 
 
 			WeaponState=1;
 		}
 	} else if (WeaponState == 1) {
-//InishaliseingA == 1;
-// setting the presser in the recoil chamber to presuered
 
-		//Serial.print("hi 1");Serial.println(TransitionStart);
+
+		// second retraction sequence
+		// fill the retraction chamber with full pressure
  		int retractfilltime = 1000000;
-	// this is a transient state
-	// it always trnaisitont to 2 and starts to transistion strait way
+ 		int saftyCloseTime = 100000;
 		if (TransitionTo != 2) {
 			TransitionTo = 2;
 			TransitionStart=micros();
@@ -184,11 +180,8 @@ void loop() {
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW); 
 
-		} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime) ){
-			// this is baicly only open long enught to open the value up a bit
-			// Tune ME please!!
-
-			// we want the value to always close by the end of this state
+		} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime+saftyCloseTime) ){
+			//now close the values.
 
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
@@ -198,32 +191,28 @@ void loop() {
 
 		
 		} else  {
-			// this is baicly only open long enught to open the value up a bit
-			// Tune ME please!!
+
 			WeaponState=2;
 		}
 
 	} else if (WeaponState == 2) {
-//InishaliseingA == 1;
-// setting the presser in the recoil chamber to metered presuered at 0.3 bar
-
 	
 		int retractemptytime = 2000000;
-		// this is a transient state
-		// it always trnaisitont to 2 and starts to transistion strait way
+		int saftyCloseTime = 100000;
+		// now we vent the retraction chamber to 0.3 bar
 		if (TransitionTo !=3) {
 			TransitionTo = 3;
 			TransitionStart=micros();
 			TransitionFrom= 2;
 			Serial.println("Start Init 2");
 		} else if (micros()<TransitionStart+ValveDopeningTime+retractemptytime) {
-			Seloind(ValveAPin,LOW); // Comand Open
+			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,HIGH);
 			Seloind(ValveEPin,LOW); 
 		
-		} else if ((micros()>TransitionStart+ValveDopeningTime+retractemptytime) and (micros()<TransitionStart+ValveDopeningTime+retractemptytime+ValveDclosingTime)) {
+		} else if ((micros()>TransitionStart+ValveDopeningTime+retractemptytime) and (micros()<TransitionStart+ValveDopeningTime+retractemptytime+ValveDclosingTime+saftyCloseTime)) {
 			// this is baicly only open long enught to open the value up a bit
 			// Tune ME please!!
 
@@ -254,7 +243,7 @@ void loop() {
 		Seloind(ValveBPin,LOW);
 		Seloind(ValveCPin,LOW);
 		Seloind(ValveDPin,HIGH);
-		Seloind(ValveEPin,HIGH)	;
+		Seloind(ValveEPin,HIGH);
 			 
 		if (micros()>HartBeatTimer+1000000){
 			HartBeatTimer=micros();
@@ -285,6 +274,7 @@ void loop() {
 				TransitionStart=micros();
 				TransitionTo=-1;
 			} else if ((NewComandState==-1) and (TransitionTo!=-1)) {
+				digitalWrite(boardLEDPin,0);
 				TransitionTo=-1;
 				TransitionStart=micros();
 				TransitionFrom= 4;
@@ -293,6 +283,7 @@ void loop() {
 
 	} else if (WeaponState == 5) {
 		 // this is charging,
+		 int filltime=100000;
 		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
 			TransitionStart=micros();
@@ -306,7 +297,7 @@ void loop() {
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW); 
 		
-		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+100000) {
+		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+filltime) {
 			// Tune ME please!!
 
 			Seloind(ValveAPin,HIGH); 
@@ -358,7 +349,7 @@ void loop() {
 			}
 	    	}//no need for a else if as may now be true
 	    	
-	    	
+	    	int fireingtime=1000000;
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
@@ -368,12 +359,12 @@ void loop() {
 				Seloind(ValveDPin,LOW);
 				Seloind(ValveEPin,LOW);
 	    		
-	    		} else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+1000){
+	    		} else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+fireingtime){
 				Seloind(ValveAPin,LOW); 
 				Seloind(ValveBPin,HIGH);
 				Seloind(ValveCPin,LOW);
 				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,HIGH);
+				Seloind(ValveEPin,LOW);
 				// all return states want these values open
 	    		}else{
 	    			WeaponState=TransitionTo;
