@@ -419,7 +419,7 @@ void loop() {
 			retractTimer1=micros();
 		} 
 		
-		if (micros()>RetractTime ){
+		if (micros()>retractTimer1+RetractTime ){
 			if (NewComandState == 6) {
 				retractState = 0;
 				WeaponState = 5;
