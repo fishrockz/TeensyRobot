@@ -51,7 +51,7 @@ unsigned long HartBeatTimer;
 int HaertBeat = -1;
 
 int ValveAopeningTime=100000;
-int ValveAclosingTime=100000;
+int ValveAclosingTime=500000;
 int ValveBopeningTime=100000;
 int ValveBclosingTime=100000;
 int ValveCopeningTime=100000;
@@ -139,6 +139,7 @@ void loop() {
 		// first vent
 
 		int ExhaustTime = 100000;
+		int checkEisshuttime= 400000;
 		if (TransitionTo !=1) {
 			TransitionTo = 1;
 			TransitionStart=micros();
@@ -150,14 +151,14 @@ void loop() {
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,1);
-		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime) {
+		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime+checkEisshuttime) {
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW);
 	
-		} else if (micros()>TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime) { 
+		} else if (micros()>TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime+checkEisshuttime) { 
 
 			WeaponState=1;
 		}
@@ -166,35 +167,39 @@ void loop() {
 
 		// second retraction sequence
 		// fill the retraction chamber with full pressure
- 		int retractfilltime = 1000000;
- 		int saftyCloseTime = 100000;
-		if (TransitionTo != 2) {
-			TransitionTo = 2;
-			TransitionStart=micros();
-			TransitionFrom= 1;
-			Serial.println("Start Init 1");
-		} else if (micros()<TransitionStart+ValveCopeningTime+retractfilltime) {
-			Seloind(ValveAPin,LOW); // Comand Open
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,HIGH);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW); 
+		int ActiveRetract=0;
+		if (ActiveRetract==1){
+	 		int retractfilltime = 1000000;
+	 		int saftyCloseTime = 100000;
+			if (TransitionTo != 2) {
+				TransitionTo = 2;
+				TransitionStart=micros();
+				TransitionFrom= 1;
+				Serial.println("Start Init 1");
+			} else if (micros()<TransitionStart+ValveCopeningTime+retractfilltime) {
+				Seloind(ValveAPin,LOW); // Comand Open
+				Seloind(ValveBPin,LOW);
+				Seloind(ValveCPin,HIGH);
+				Seloind(ValveDPin,LOW);
+				Seloind(ValveEPin,LOW); 
 
-		} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime+saftyCloseTime) ){
-			//now close the values.
+			} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime+saftyCloseTime) ){
+				//now close the values.
 
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW);
+				Seloind(ValveAPin,LOW); 
+				Seloind(ValveBPin,LOW);
+				Seloind(ValveCPin,LOW);
+				Seloind(ValveDPin,LOW);
+				Seloind(ValveEPin,LOW);
 
 		
-		} else  {
+			} else  {
 
-			WeaponState=2;
+				WeaponState=2;
+			}
+		}else{
+			WeaponState=5;
 		}
-
 	} else if (WeaponState == 2) {
 	
 		int retractemptytime = 2000000;
@@ -282,7 +287,7 @@ void loop() {
 		}
 
 	} else if (WeaponState == 5) {
-		 // this is charging,
+		 // this is charging,it always gose to Armed after a set legnth of time.
 		 int filltime=100000;
 		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
