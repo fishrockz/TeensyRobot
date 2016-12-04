@@ -46,6 +46,8 @@ int TransitionFrom = -99; // -99 can be the past
 
 unsigned long TransitionStart;// 70 miniutes till micros overflows
 unsigned long TransitionTimer1;
+unsigned long retractTimer1;
+int retractState=0;
 
 unsigned long HartBeatTimer;
 int HaertBeat = -1;
@@ -123,7 +125,7 @@ void loop() {
 					NewComandState=6;// not fireing so Ask to transitiont to Armed when availale
 				}else if (valF>1800) {
 					if (WeaponState==6){
-						NewComandState=8;// Ask for single Firing/free return
+						NewComandState=9;// Ask for single Firing/free return
 						
 					}else {
 						int sytatx=0;
@@ -244,6 +246,8 @@ void loop() {
 		Seloind(ValveCPin,LOW);
 		Seloind(ValveDPin,HIGH);
 		Seloind(ValveEPin,HIGH);
+		
+		retractState=0;
 			 
 		if (micros()>HartBeatTimer+1000000){
 			HartBeatTimer=micros();
@@ -283,7 +287,7 @@ void loop() {
 
 	} else if (WeaponState == 5) {
 		 // this is charging,
-		 int filltime=100000;
+		 int filltime=1000000;
 		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
 			TransitionStart=micros();
@@ -349,7 +353,7 @@ void loop() {
 			}
 	    	}//no need for a else if as may now be true
 	    	
-	    	int fireingtime=1000000;
+	    	int fireingtime=100000;
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
@@ -396,11 +400,36 @@ void loop() {
 		
 		
 		
-	} else if (WeaponState == 9){  
+	} else if (WeaponState == 9){
 		// power return	
 		// back to Charging so we can be armed again.
 		
+		int RetractTime = 5000000;
 		
+		
+		Seloind(ValveAPin,LOW);
+		Seloind(ValveBPin,HIGH);
+		Seloind(ValveCPin,HIGH);
+		Seloind(ValveDPin,LOW);
+		Seloind(ValveEPin,HIGH);
+		
+		
+		if (retractState==0){
+			retractState=1;
+			retractTimer1=micros();
+		} 
+		
+		if (micros()>RetractTime ){
+			if (NewComandState == 6) {
+				retractState = 0;
+				WeaponState = 5;
+				TransitionTo=5;
+				
+			}
+
+		}
+
+				
 		
 	} else {
 		Serial.println("WeaponState error!!");
