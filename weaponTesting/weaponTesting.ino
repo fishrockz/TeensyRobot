@@ -194,7 +194,7 @@ void loop() {
 			Seloind(ValveAPin,LOW); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,HIGH);
-			Seloind(ValveDPin,LOW);
+			Seloind(ValveDPin,HIGH);
 			Seloind(ValveEPin,LOW);
 			TransitionTo=6;
 		}
@@ -220,9 +220,9 @@ void loop() {
 			}	
 
 		} else {
-			Seloind(ValveAPin,LOW); 
+			Seloind(ValveAPin,HIGH); 
 			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,HIGH);
+			Seloind(ValveCPin,LOW);
 			Seloind(ValveDPin,LOW);
 			Seloind(ValveEPin,LOW);
 			TransitionTo=7;
