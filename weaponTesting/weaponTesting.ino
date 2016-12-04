@@ -31,14 +31,14 @@ int WeaponState=-1;
 // -1	 	== non inishalised (	Inishaliseing part A )
 // 1		== InishaliseingA
 // 2		== InishaliseingB
-
+//
 // 4		== Disamred
-// 5		== Charging
-// 6		== Armed
-// 7		== Firing
-// 8		== Free	Return
-// 9		== Power Return
-// 10		== Buffer Vent
+// 
+// 6		== retract
+// 7		== extend
+// 8		
+// 9		
+// 10		
 
 int NewComandState=4;
 int TransitionTo;
@@ -123,10 +123,10 @@ void loop() {
 					NewComandState=6;// not fireing so Ask to transitiont to Armed when availale
 				}else if (valF>1800) {
 					if (WeaponState==6){
-						NewComandState=8;// Ask for single Firing/free return
+						NewComandState=7;// Ask for single Firing/free return
 						
 					}else {
-						int sytatx=0;
+						int sytatx=0;// dont go straight to firing from disarmed
 					}
 				}
 
@@ -134,112 +134,9 @@ void loop() {
 		}
 	}
 //Serial.print("General: ");Serial.print(WeaponState);Serial.print(" ");Serial.print(TransitionTo);Serial.print(" ");Serial.print(NewComandState);Serial.println();
-	if (WeaponState==-1) {
-		// start of the retraction sequence
-		// first vent
-
-		int ExhaustTime = 100000;
-		int checkEisshuttime= 400000;
-		if (TransitionTo !=1) {
-			TransitionTo = 1;
-			TransitionStart=micros();
-			TransitionFrom= -1;
-			Serial.println("Start Init");
-		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime) {
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,1);
-		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime+checkEisshuttime) {
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW);
-	
-		} else if (micros()>TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime+checkEisshuttime) { 
-
-			WeaponState=1;
-		}
-	} else if (WeaponState == 1) {
 
 
-		// second retraction sequence
-		// fill the retraction chamber with full pressure
-		int ActiveRetract=0;
-		if (ActiveRetract==1){
-	 		int retractfilltime = 1000000;
-	 		int saftyCloseTime = 100000;
-			if (TransitionTo != 2) {
-				TransitionTo = 2;
-				TransitionStart=micros();
-				TransitionFrom= 1;
-				Serial.println("Start Init 1");
-			} else if (micros()<TransitionStart+ValveCopeningTime+retractfilltime) {
-				Seloind(ValveAPin,LOW); // Comand Open
-				Seloind(ValveBPin,LOW);
-				Seloind(ValveCPin,HIGH);
-				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,LOW); 
-
-			} else if ((micros()>TransitionStart+ValveCopeningTime+retractfilltime) and (micros()<TransitionStart+ValveCopeningTime+retractfilltime+ValveCclosingTime+saftyCloseTime) ){
-				//now close the values.
-
-				Seloind(ValveAPin,LOW); 
-				Seloind(ValveBPin,LOW);
-				Seloind(ValveCPin,LOW);
-				Seloind(ValveDPin,LOW);
-				Seloind(ValveEPin,LOW);
-
-		
-			} else  {
-
-				WeaponState=2;
-			}
-		}else{
-			WeaponState=5;
-		}
-	} else if (WeaponState == 2) {
-	
-		int retractemptytime = 2000000;
-		int saftyCloseTime = 100000;
-		// now we vent the retraction chamber to 0.3 bar
-		if (TransitionTo !=3) {
-			TransitionTo = 3;
-			TransitionStart=micros();
-			TransitionFrom= 2;
-			Serial.println("Start Init 2");
-		} else if (micros()<TransitionStart+ValveDopeningTime+retractemptytime) {
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,HIGH);
-			Seloind(ValveEPin,LOW); 
-		
-		} else if ((micros()>TransitionStart+ValveDopeningTime+retractemptytime) and (micros()<TransitionStart+ValveDopeningTime+retractemptytime+ValveDclosingTime+saftyCloseTime)) {
-			// this is baicly only open long enught to open the value up a bit
-			// Tune ME please!!
-
-			// we want the value to always close by the end of this state
-
-			Seloind(ValveAPin,LOW); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW);
-
-		
-		} else if (micros()>TransitionStart+ValveDopeningTime+ValveDclosingTime) {
-			// at this point we have done a init, this might just be because of a comand to init or because we are in the arming process
-			if (NewComandState==6){
-				WeaponState=5;
-			}else{
-				WeaponState=4;
-			}
-		}
-
-	} else if (WeaponState == 4) {
+	 if (WeaponState == 4) {
 		 //Disarmed! 
 		 // This is a safe mode, so gose straight to open E
 		 // there for close A and B if
@@ -264,148 +161,72 @@ void loop() {
 			}
 		}
 		
-		if (TransitionTo == -1) {
-			// I dont want some one to beable to undo armed but leave the init switch up and then the robot to init straght away.
-			if (NewComandState != -1){
-				TransitionTo=4;
-			}else if (micros()>TransitionStart+100000){
-				digitalWrite(boardLEDPin,0);
-				WeaponState=-1;
-			}
-		} else {
-			if (NewComandState==6) {
-				digitalWrite(boardLEDPin,0);
-				WeaponState=-1;
-				TransitionStart=micros();
-				TransitionTo=-1;
-			} else if ((NewComandState==-1) and (TransitionTo!=-1)) {
-				digitalWrite(boardLEDPin,0);
-				TransitionTo=-1;
-				TransitionStart=micros();
-				TransitionFrom= 4;
-			}
-		}
-
-	} else if (WeaponState == 5) {
-		 // this is charging,it always gose to Armed after a set legnth of time.
-		 int filltime=100000;
-		if (TransitionTo!=6) {
-			TransitionTo=6;//armed
-			TransitionStart=micros();
-			TransitionFrom= 5;
-			Serial.println("Start charging");
-		}else if (micros()<TransitionStart+ValveEclosingTime) {
-			// be could be open too
-			Seloind(ValveAPin,LOW); // Comand close everything
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW); 
 		
-		} else if (micros()<TransitionStart+ValveDclosingTime+ValveAopeningTime+filltime) {
-			// Tune ME please!!
-
-			Seloind(ValveAPin,HIGH); 
-			Seloind(ValveBPin,LOW);
-			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,LOW);
-
-		} else {
-			// we are now armed and ready to fire!
+		if (NewComandState==6) {
+			digitalWrite(boardLEDPin,0);
 			WeaponState=6;
-			Serial.println("Armed");
-		
+			TransitionStart=micros();
+			TransitionTo=6;
 		}
+		
+
 	} else if (WeaponState == 6){
 		//At this point we just sit and wait
-		
-		Seloind(ValveAPin,HIGH); 
-		Seloind(ValveBPin,LOW);
-		Seloind(ValveCPin,LOW);
-		Seloind(ValveDPin,LOW);
-		Seloind(ValveEPin,LOW);
-		
-		if (NewComandState==8){//aim for a single simple fire.
-			TransitionTo=7;// first stop is fireing
-			WeaponState=7;
-			TransitionStart=micros();
-			TransitionFrom= 6;
-			Serial.println("Start Fire");
-		} else if (NewComandState==9){//aim for a single fire with power return.
-			TransitionTo=7;// first stop is fireing
-			WeaponState=7;
-			TransitionStart=micros();
-			TransitionFrom= 6;
-		}
-	} else if (WeaponState == 7){
-	
-	//big bang!!
-		if ((TransitionTo != 8) and (TransitionTo != 9)){
-			if (NewComandState==8){//aim for a single simple fire.
-				TransitionTo=8;// first stop is fireing
+
+		int shutingtime=250000;
+		if (NewComandState==7){//aim for a single simple fire.
+			if (TransitionTo!=7){
+				TransitionTo=7;// first stop is fireing
 				TransitionStart=micros();
-				TransitionFrom= 7;
-				
-			} else if (NewComandState==9){//aim for a single fire with power return.
-				TransitionTo=9;// first stop is fireing
-				TransitionStart=micros();
-				TransitionFrom= 7;
-			}
-	    	}//no need for a else if as may now be true
-	    	
-	    	int fireingtime=1000000;
-	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
-	    		if (micros()<TransitionStart+ValveAclosingTime){
-	    		
-		    		Seloind(ValveAPin,LOW); 
+				TransitionFrom= 6;
+				Serial.println("Start Fire");
+			}else if (TransitionStart<shutingtime){
+				Seloind(ValveAPin,LOW); 
 				Seloind(ValveBPin,LOW);
 				Seloind(ValveCPin,LOW);
 				Seloind(ValveDPin,LOW);
 				Seloind(ValveEPin,LOW);
-	    		
-	    		} else if (micros()<TransitionStart+ValveAclosingTime+ValveBopeningTime+fireingtime){
+			} else {
+				WeaponState=7;
+			}	
+
+		} else {
+			Seloind(ValveAPin,LOW); 
+			Seloind(ValveBPin,LOW);
+			Seloind(ValveCPin,HIGH);
+			Seloind(ValveDPin,LOW);
+			Seloind(ValveEPin,LOW);
+			TransitionTo=6;
+		}
+	} else if (WeaponState == 7){
+	
+//At this point we just sit and wait
+
+		int shutingtime=250000;
+		if (NewComandState==6){//aim for a single simple fire.
+			if (TransitionTo!=6){
+				TransitionTo=7;// first stop is fireing
+				TransitionStart=micros();
+				TransitionFrom= 6;
+				Serial.println("Start Fire");
+			} else if (TransitionStart<shutingtime){
 				Seloind(ValveAPin,LOW); 
-				Seloind(ValveBPin,HIGH);
+				Seloind(ValveBPin,LOW);
 				Seloind(ValveCPin,LOW);
 				Seloind(ValveDPin,LOW);
 				Seloind(ValveEPin,LOW);
-				// all return states want these values open
-	    		}else{
-	    			WeaponState=TransitionTo;
-	    		}
-	    	}
-	} else if (WeaponState == 8){
-		// soft return
-		// back to Charging so we can be armed again.
-		
-		int RetractTime = 1000000;
-		
-		if (NewComandState == 6) {
-			if (TransitionTo != 5){
-				TransitionTo = 5;
-				TransitionStart=micros();
-				TransitionFrom= 1;
-			}else if (micros() > TransitionStart+RetractTime) {
-				WeaponState = 5;
-			}
+			} else {
+				WeaponState=6;
+			}	
 
 		} else {
-			Seloind(ValveAPin,LOW);
-			Seloind(ValveBPin,HIGH);
-			Seloind(ValveCPin,LOW);
+			Seloind(ValveAPin,LOW); 
+			Seloind(ValveBPin,LOW);
+			Seloind(ValveCPin,HIGH);
 			Seloind(ValveDPin,LOW);
-			Seloind(ValveEPin,HIGH);
+			Seloind(ValveEPin,LOW);
+			TransitionTo=7;
 		}
-		
-		
-		
-		
-	} else if (WeaponState == 9){  
-		// power return	
-		// back to Charging so we can be armed again.
-		
-		
 		
 	} else {
 		Serial.println("WeaponState error!!");
