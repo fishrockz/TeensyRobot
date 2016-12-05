@@ -287,7 +287,7 @@ void loop() {
 
 	} else if (WeaponState == 5) {
 		 // this is charging,
-		 int filltime=1000000;
+		 int filltime=2000000;
 		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
 			TransitionStart=micros();
@@ -353,7 +353,7 @@ void loop() {
 			}
 	    	}//no need for a else if as may now be true
 	    	
-	    	int fireingtime=100000;
+	    	int fireingtime=1000000;
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
