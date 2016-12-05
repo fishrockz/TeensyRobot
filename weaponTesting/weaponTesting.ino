@@ -287,7 +287,7 @@ void loop() {
 
 	} else if (WeaponState == 5) {
 		 // this is charging,
-		 int filltime=2000000;
+		 int filltime=7000000;
 		if (TransitionTo!=6) {
 			TransitionTo=6;//armed
 			TransitionStart=micros();
@@ -404,7 +404,7 @@ void loop() {
 		// power return	
 		// back to Charging so we can be armed again.
 		
-		int RetractTime = 5000000;
+		int RetractTime = 7000000;
 		
 		
 		Seloind(ValveAPin,LOW);
