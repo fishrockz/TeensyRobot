@@ -307,7 +307,7 @@ void loop() {
 			Seloind(ValveAPin,HIGH); 
 			Seloind(ValveBPin,LOW);
 			Seloind(ValveCPin,LOW);
-			Seloind(ValveDPin,LOW);
+			Seloind(ValveDPin,HIGH);
 			Seloind(ValveEPin,LOW);
 
 		} else {
@@ -322,7 +322,7 @@ void loop() {
 		Seloind(ValveAPin,HIGH); 
 		Seloind(ValveBPin,LOW);
 		Seloind(ValveCPin,LOW);
-		Seloind(ValveDPin,LOW);
+		Seloind(ValveDPin,HIGH);
 		Seloind(ValveEPin,LOW);
 		
 		if (NewComandState==8){//aim for a single simple fire.
