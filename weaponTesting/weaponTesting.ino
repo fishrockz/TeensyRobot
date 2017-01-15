@@ -338,7 +338,7 @@ void loop() {
 			TransitionFrom= 6;
 		}
 	} else if (WeaponState == 7){
-	
+	// this is the fireing state, were only value B is open
 	//big bang!!
 		if ((TransitionTo != 8) and (TransitionTo != 9)){
 			if (NewCommandState==8){//aim for a single simple fire.
@@ -352,7 +352,7 @@ void loop() {
 				TransitionFrom= 7;
 			}
 	    	}//no need for a else if as may now be true
-	    	
+	    	// this value can be fettled to help with getting the retract right.
 	    	int FiringTime=1000000;
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
