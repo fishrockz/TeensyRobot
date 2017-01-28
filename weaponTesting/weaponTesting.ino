@@ -1,11 +1,5 @@
-//#include <SPI.h>
-//#include "SdFat.h"
 #include <PulsePosition.h>
-// 32 KiB buffer.
-//const size_t BUF_DIM = 32768;
 
-// 8 MiB file.
-//const uint32_t FILE_SIZE = 256UL*BUF_DIM;
 
 const uint32_t PPMPin = 10;//only certain pins work, eg, 10 on teensy 3.1
 const uint32_t boardLEDPin = 13;
