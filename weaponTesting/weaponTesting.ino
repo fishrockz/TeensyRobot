@@ -125,7 +125,8 @@ void loop() {
 					NewCommandState=6;// not firing so Ask to transition to Armed when availale
 				}else if (valF>1800) {
 					if (WeaponState==6){
-						NewCommandState=9;// Ask for single Firing/free return
+						NewCommandState=8;// Ask for single Firing/free return
+            //NewCommandState=9;// Ask for single Firing/power return
 						
 					}else {
 						int sytatx=0;
@@ -140,7 +141,7 @@ void loop() {
 		// start of the retract sequence
 		// first vent
 
-		int ExhaustTime = 100000;
+		int ExhaustTime = 300000;
 		if (TransitionTo !=1) {
 			TransitionTo = 1;
 			TransitionStart=micros();
@@ -151,7 +152,7 @@ void loop() {
 			Solenoid(ValveBPin,LOW);
 			Solenoid(ValveCPin,LOW);
 			Solenoid(ValveDPin,LOW);
-			Solenoid(ValveEPin,1);
+			Solenoid(ValveEPin,HIGH);
 		} else if (micros()<TransitionStart+ValveEopeningTime+ExhaustTime+ValveEclosingTime) {
 			Solenoid(ValveAPin,LOW); 
 			Solenoid(ValveBPin,LOW);
@@ -168,7 +169,7 @@ void loop() {
 
 		// second power retract sequence
 		// fill the buffer volume with full pressure
- 		int RetractFillTime = 1000000;
+ 		int RetractFillTime = 5000000;
  		int SafetyCloseTime = 100000;
 		if (TransitionTo != 2) {
 			TransitionTo = 2;
@@ -200,7 +201,7 @@ void loop() {
 	} else if (WeaponState == 2) {
 	
 		int RetractEmptyTime = 2000000;
-		int  = 100000;
+		int SafetyCloseTime = 100000;
 		// now we vent the buffer volume to 0.3 bar
 		if (TransitionTo !=3) {
 			TransitionTo = 3;
@@ -353,11 +354,11 @@ void loop() {
 			}
 	    	}//no need for a else if as may now be true
 	    	// this value can be fettled to help with getting the retract right.
-	    	int FiringTime=1000000;
+	    	int FiringTime=20000;
 	    	if ((TransitionTo == 8) or (TransitionTo == 9)) {
 	    		if (micros()<TransitionStart+ValveAclosingTime){
 	    		
-		    		Solenoid(ValveAPin,LOW); 
+		    Solenoid(ValveAPin,LOW); 
 				Solenoid(ValveBPin,LOW);
 				Solenoid(ValveCPin,LOW);
 				Solenoid(ValveDPin,LOW);
@@ -378,7 +379,7 @@ void loop() {
 		// soft return
 		// back to Charging so we can be armed again.
 		
-		int RetractTime = 1000000;
+		int RetractTime = 300000;
 		
 		if (NewCommandState == 6) {
 			if (TransitionTo != 5){
@@ -404,7 +405,7 @@ void loop() {
 		// power retract
 		// back to Charging so we can be armed again.
 		
-		int RetractTime = 7000000;
+		int RetractTime = 3000000;
 		
 		
 		Solenoid(ValveAPin,LOW);
