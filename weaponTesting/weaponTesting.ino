@@ -4,11 +4,11 @@
 const uint32_t PPMPin = 10;//only certain pins work, eg, 10 on teensy 3.1
 const uint32_t boardLEDPin = 13;
 
-const uint32_t ValveAPin = 4;// chamber fill port
-const uint32_t ValveBPin = 5;// main pilot exhaust
-const uint32_t ValveCPin = 6;// buffer fill
-const uint32_t ValveDPin = 7;// buffer exhaust
-const uint32_t ValveEPin = 8;// chamber exhaust
+const uint32_t ValveAPin = 3;// chamber fill port
+const uint32_t ValveBPin = 4;// main pilot exhaust
+const uint32_t ValveCPin = 5;// buffer fill
+const uint32_t ValveDPin = 6;// buffer exhaust
+const uint32_t ValveEPin = 9;// chamber exhaust
 
 
 
@@ -107,6 +107,7 @@ void loop() {
 		if (num == 8) {
 
 			float valArm = RadioIn.read(5);
+			float valExtras = RadioIn.read(7);
 			//Serial.println(valArm);
 			if (valArm<1800){
 				WeaponState=4;
