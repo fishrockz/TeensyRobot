@@ -5,15 +5,21 @@
 class StateMachineClass
 {
 public:
-  void foo();
+
   int bar;
   void updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5); 
+ int defaultStateTimeOutFunction(int input);
   StateMachineClass( usb_serial_class &print );
-
+void tickFunction();
   
   private:
     usb_serial_class* printer;  
-  int DebugLevel=22;
+  int DebugLevel=0;
   void setMachineState(int NewState);
-  int currentState;
+  int currentState=0;
+  int TransitionState=0;
+  unsigned long TransitionStartMicros=0;
+  int TelemiteryMode=0;
+  unsigned long telemMillis=0;
+  unsigned long telemMillisRefreshRate=100;
 };

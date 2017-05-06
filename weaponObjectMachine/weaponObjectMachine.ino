@@ -4,7 +4,7 @@
 //Custom Robot Libarys
 #include "weaponObjectMachine.h" 
 
-const int DebugLevel=20;
+const int DebugLevel=0;
 
 const uint32_t PPMPin = 10;//only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 const uint32_t boardLEDPin = 13;
@@ -77,6 +77,10 @@ void loop() {
   // put your main code here, to run repeatedly:
 	//theWeapon.foo();
 	
+	theWeapon.tickFunction();
+	
+	
+	
 	int num = RadioIn.available();
 	if (num == 8) {
 
@@ -96,6 +100,9 @@ void loop() {
 		oneSwitchFromChan(valRadio4,switch5);
 		twoSwitchesFromChan(valRadio2,switch1,switch2);
 		twoSwitchesFromChan(valRadio3,switch3,switch4);
+		
+		if (DebugLevel>10){Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.print(switch4);Serial.print(" ");Serial.println(switch5);}
+		
 		theWeapon.updateSwitches(switch1,switch2,switch3,switch4,switch5);
 		
 		
