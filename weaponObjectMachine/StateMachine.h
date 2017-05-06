@@ -14,4 +14,6 @@ public:
   private:
     usb_serial_class* printer;  
   int DebugLevel=22;
+  void setMachineState(int NewState);
+  int currentState;
 };
