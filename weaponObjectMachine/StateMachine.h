@@ -11,7 +11,7 @@ public:
  int defaultStateTimeOutFunction(int input);
   StateMachineClass( usb_serial_class &print );
 void tickFunction();
-  
+void  debugFunction();
   private:
     usb_serial_class* printer;  
   int DebugLevel=0;
@@ -21,5 +21,5 @@ void tickFunction();
   unsigned long TransitionStartMicros=0;
   int TelemiteryMode=0;
   unsigned long telemMillis=0;
-  unsigned long telemMillisRefreshRate=100;
+  unsigned long telemMillisRefreshRate=1000;
 };

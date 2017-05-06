@@ -1,7 +1,7 @@
 #include "StateMachine.h"
 
 
-
+//Value Stuff
 const int numberOfValues=5;
 // ValveAPin = 3;// chamber fill port
 // ValveBPin = 4;// main pilot exhaust
@@ -27,7 +27,7 @@ const int reversvalue [numberOfValues] = {
 /*Valve E*/  0,
 };
 
-
+//state stuff
 const int numberofStates=9;
 
 const int ValueState[numberofStates][numberOfValues] = {
@@ -65,36 +65,37 @@ const char *StateNames[numberofStates] = { "Safe State", "Retract/fill Buffer", 
 const int StateLeadinTimes[numberofStates] = { 
 /* Safe State */	100000, 
 /* Retract/fill Buffer */	10000, 
+/* Retract wait */	10000, 
 /* Rest */	10000, 
-/* charge */	10000, 
-/* Armed */	10000, 
-/* Fire */	10000,
-/* Fired */	10000,
+/* Arming */	10000, 
+/*  */	10000,
+/*  */	10000,
 /* Fire */	10000,
 /* Fired */	10000,
 };
 const int StateMinTimes[numberofStates] = { 
 /* Safe State */	100000, 
 /* Retract/fill Buffer */	100000, 
+/* Retract wait */	100000, 
 /* Rest */	100000, 
-/* charge */	100000, 
-/* Armed */	100000, 
-/* Fire */	100000,
-/* Fired */	100000,
+/* Arming */	100000, 
+/*  */	100000,
+/*  */	100000,
 /* Fire */	100000,
 /* Fired */	100000,
 };
 
+//State Machine
 
 int StateMachineClass::defaultStateTimeOutFunction(int input){
-printer->println("I'm StateMachineClass::defaultStateTimeOutFunction");
+//printer->println("I'm StateMachineClass::defaultStateTimeOutFunction");
 
- if (TransitionStartMicros + StateMinTimes[currentState]+StateLeadinTimes[currentState] > micros() ){
-return -1;// send me to safe!
-}else{
-
-return currentState;
-}
+	if (TransitionStartMicros + StateMinTimes[currentState]+StateLeadinTimes[currentState] < micros() ){
+		return currentState;
+	}else{
+		return -3;
+		
+	}
 }
 
 typedef int (StateMachineClass::*IntFunctionWithOneParameter) (int a);
@@ -120,6 +121,19 @@ StateMachineClass::StateMachineClass( usb_serial_class &print ) {
 }  
 
 
+void StateMachineClass::debugFunction(void ){
+
+printer->print("StateMachineClass::debugFunction");
+printer->print("<TelemPacket>");
+printer->print("<State=");
+printer->print(currentState);
+printer->print(">");
+printer->print("<TransitionState=");
+printer->print(TransitionState);
+printer->print(">");
+printer->println("</ TelemPacket>");
+}
+
 
 void StateMachineClass::tickFunction(void ){
 	
@@ -130,16 +144,23 @@ void StateMachineClass::tickFunction(void ){
 		if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
 			
 			printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
+			debugFunction();
 			telemMillis=millis();
 		}
 	}
 	
 	if(TransitionState!=0){
 		int tmpContInfo=(this->*ContinueState[currentState])(0);
-		if (tmpContInfo>-1)
+		if (tmpContInfo!=-3)
 		{
 		TransitionState=0;
-		printer->println("StateMachineClass::tickFunction now at State");
+		printer->print("StateMachineClass::tickFunction now at State ");
+		printer->print(currentState);
+		printer->print(" ");
+		printer->println(StateNames[currentState]);
+		
+		
+		
 		}
 	}
 }
@@ -153,7 +174,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 	}
 	
 	if (NewState!=currentState){
-		printer->print("StateMachineClass::setMachineState going to");
+		printer->print("StateMachineClass::setMachineState going to ");
 		printer->println(NewState);
 	}
 	currentState=NewState;
