@@ -85,7 +85,7 @@ const int StateLeadinTimes[numberofStates] = {
 
 
 
-StateMachineClass theWeapon;
+StateMachineClass theWeapon(Serial);
 PulsePositionInput RadioIn;
 void setup() {
   // put your setup code here, to run once:
@@ -161,11 +161,17 @@ void loop() {
 
 		twoSwitchesFromChan(valRadio2,switch1,switch2);
 		twoSwitchesFromChan(valRadio3,switch3,switch4);
+		theWeapon.updateSwitches(switch1,switch2,switch3,switch4);
 		
 		
-		
-		if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
+		//if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
