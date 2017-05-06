@@ -7,7 +7,7 @@ class StateMachineClass
 public:
   void foo();
   int bar;
-  void updateSwitches(int switch1, int switch2, int switch3, int switch4); 
+  void updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5); 
   StateMachineClass( usb_serial_class &print );
 
   

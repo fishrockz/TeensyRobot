@@ -101,7 +101,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 
 
 
-void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, int switch4){
+void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5){
 	printer->println("StateMachineClass");
 	
 	
@@ -115,7 +115,7 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 	
 	
 	
-	if (DebugLevel>10){printer->print(switch1);printer->print(" ");printer->print(switch2);printer->print(" ");printer->print(switch3);printer->print(" ");printer->println(switch4);}
+	if (DebugLevel>10){printer->print(switch1);printer->print(" ");printer->print(switch2);printer->print(" ");printer->print(switch3);printer->print(" ");printer->print(switch4);printer->print(" ");printer->println(switch5);}
 	
 
 }

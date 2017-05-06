@@ -34,6 +34,19 @@ int switch1,switch2,switch3,switch4,switch5;
 int pot1;
 
 
+void oneSwitchFromChan(int chanel,int &switchA){
+
+	chanel-=1000;
+	if (chanel<325){
+		switchA=0;
+	}else if (chanel<700) {
+		switchA=1;
+	} else {
+		switchA=2;
+	}
+
+}
+
 void twoSwitchesFromChan(int chanel,int &switchA,int &switchB) {
 	
 
@@ -77,16 +90,13 @@ void loop() {
 		//if (DebugLevel>10){Serial.println(valArm);}
 		
 		
-		
-		
-		
-		
+
 		if (DebugLevel>10){Serial.print(valRadio1);Serial.print(" ");Serial.print(valRadio2);Serial.print(" ");Serial.print(valRadio3);Serial.print(" ");Serial.println(valRadio4);}
 	
-
+		oneSwitchFromChan(valRadio4,switch5);
 		twoSwitchesFromChan(valRadio2,switch1,switch2);
 		twoSwitchesFromChan(valRadio3,switch3,switch4);
-		theWeapon.updateSwitches(switch1,switch2,switch3,switch4);
+		theWeapon.updateSwitches(switch1,switch2,switch3,switch4,switch5);
 		
 		
 		//if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
