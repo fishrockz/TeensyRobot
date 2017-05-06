@@ -63,7 +63,7 @@ const int ValueState[numberofStates][numberOfValues] = {
 const char *StateNames[numberofStates] = { "Safe State", "Retract/fill Buffer", "Expand Buffer","Rest","Arming","Ready to Fire","Waiting to Fire","Fire","Fired"}; 
 
 const int StateLeadinTimes[numberofStates] = { 
-/* Safe State */	100000, 
+/* Safe State */	10000, 
 /* Retract/fill Buffer */	10000, 
 /* Retract wait */	10000, 
 /* Rest */	10000, 
@@ -89,7 +89,7 @@ const int StateMinTimes[numberofStates] = {
 
 int StateMachineClass::defaultStateTimeOutFunction(int input){
 //printer->println("I'm StateMachineClass::defaultStateTimeOutFunction");
-
+	//StateMinTimes[currentState]+StateLeadinTimes[currentState]
 	if (TransitionStartMicros + StateMinTimes[currentState]+StateLeadinTimes[currentState] < micros() ){
 		return currentState;
 	}else{
@@ -121,6 +121,20 @@ StateMachineClass::StateMachineClass( usb_serial_class &print ) {
 }  
 
 
+void StateMachineClass::setMachineState( int NewState ) { 
+  
+  
+  	
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		//digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
+		pinMode(ValvePins[valveII],OUTPUT)
+	}
+//for( int valveII = 0; valveII < numberOfValues; valveII += 1 ) {
+//		);
+//	}
+	
+}  
+
 void StateMachineClass::debugFunction(void ){
 
 printer->print("StateMachineClass::debugFunction");
@@ -151,6 +165,9 @@ void StateMachineClass::tickFunction(void ){
 	
 	if(TransitionState!=0){
 		int tmpContInfo=(this->*ContinueState[currentState])(0);
+		printer->print("StateMachineClass::tickFunction transition test ");
+		printer->println(tmpContInfo);
+		
 		if (tmpContInfo!=-3)
 		{
 		TransitionState=0;
@@ -170,16 +187,23 @@ void StateMachineClass::setMachineState( int NewState ) {
   
   	
 	for ( int valveII;valveII< numberOfValues;valveII++){
-		digitalWrite(valveII,ValueState[NewState][valveII]);
+		//digitalWrite(valveII,ValueState[NewState][valveII]);
+		digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
 	}
 	
 	if (NewState!=currentState){
 		printer->print("StateMachineClass::setMachineState going to ");
-		printer->println(NewState);
+		printer->print(NewState);
+		printer->print(" ");
+		printer->println(StateNames[NewState]);
+		
+		
+		
+		currentState=NewState;
+		TransitionState=1;
+		TransitionStartMicros=micros();
 	}
-	currentState=NewState;
-	TransitionState=1;
-	TransitionStartMicros=micros();
+	
 	
 }  
 

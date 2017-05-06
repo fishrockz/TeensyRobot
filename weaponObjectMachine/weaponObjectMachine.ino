@@ -18,6 +18,8 @@ void setup() {
   // put your setup code here, to run once:
 	RadioIn.begin(9);
 	
+	theWeapon.setState(0)
+	
 }
 
 
