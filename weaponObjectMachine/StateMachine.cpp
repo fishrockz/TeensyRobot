@@ -76,16 +76,29 @@ const int StateLeadinTimes[numberofStates] = {
 /* Fired */			10000,
 };
 const int StateMinTimes[numberofStates] = { 
-/* Safe State */		100000, 
-/* Retract/fill Buffer */	100000, 
-/* Retract wait */		100000, 
-/* Rest */			100000, 
-/* Arming */			100000, 
-/* Ready to Fire */		100000,
-/* Waiting to Fire */		100000,
-/* Fire */			100000,
-/* Fired */			100000,
+/* Safe State */		10000, 
+/* Retract/fill Buffer */	300000, 
+/* Retract wait */		2000000, 
+/* Rest */			10000, 
+/* Arming */			3000000, 
+/* Ready to Fire */		10000,
+/* Waiting to Fire */		10000,
+/* Fire */			10000,
+/* Fired */			1000000,
 };
+
+const int StateAutoTransitionTimes[numberofStates] = { 
+/* Safe State */		10000, 
+/* Retract/fill Buffer */	10000, 
+/* Retract wait */		10000, 
+/* Rest */			10000, 
+/* Arming */			10000, 
+/* Ready to Fire */		20000000,
+/* Waiting to Fire */		10000,
+/* Fire */			10000,
+/* Fired */			10000,
+};
+
 
 
 const int AutoTransitionTo[numberofStates] = { 
@@ -107,11 +120,16 @@ const int AutoTransitionTo[numberofStates] = {
 int StateMachineClass::defaultStateTimeOutFunction(int input){
 //printer->println("I'm StateMachineClass::defaultStateTimeOutFunction");
 	//StateMinTimes[currentState]+StateLeadinTimes[currentState]
-	if (TransitionStartMicros + StateMinTimes[currentState]+StateLeadinTimes[currentState] < micros() ){
-		return currentState;
-	}else{
-		return -3;
-		
+	unsigned long currentTime = micros();
+	
+	
+	if (	TransitionStartMicros + StateLeadinTimes[currentState] + StateMinTimes[currentState] + StateAutoTransitionTimes[currentState] < currentTime ){
+		return 0;// past auto transition
+	
+	} else if (		TransitionStartMicros + StateLeadinTimes[currentState] + StateMinTimes[currentState] < currentTime ){
+		return 1; // past min
+	} else {
+		return -1;// in tranision do not change
 	}
 }
 
@@ -188,20 +206,39 @@ void StateMachineClass::tickFunction(void ){
 	
 	if(TransitionState!=0){
 		int tmpContInfo=(this->*ContinueState[currentState])(0);
-		//printer->print("StateMachineClass::tickFunction transition test ");
-		//printer->println(tmpContInfo);
+	//	printer->print("StateMachineClass::tickFunction transition test ");
+	//	printer->println(tmpContInfo);
 		
-		if (tmpContInfo!=-3)
+		if (tmpContInfo==0)
 		{
+			//if (TransitionState<1){
+				printer->print("StateMachineClass::tickFunction now at State ");
+				printer->print(currentState);
+				printer->print(" ");
+				printer->println(StateNames[currentState]);
+			//}
 			TransitionState=0;
-			printer->print("StateMachineClass::tickFunction now at State ");
-			printer->print(currentState);
-			printer->print(" ");
-			printer->println(StateNames[currentState]);
-		
+			
 			if (AutoTransitionTo[currentState]>-1){
-				setMachineState(AutoTransitionTo[currentState]);
+				int gotostate=AutoTransitionTo[currentState];
+					
+				printer->print("StateMachineClass::tickFunction going to State ");
+				printer->print(gotostate);
+				printer->print(" ");
+				printer->println(StateNames[gotostate]);
+			
+				setMachineState(gotostate);
 			}
+		}else if (tmpContInfo==1){
+			if (TransitionState!=1){
+				printer->print("StateMachineClass::tickFunction passed minimum time in state: ");
+				printer->print(currentState);
+				printer->print(" ");
+				printer->println(StateNames[currentState]);
+			
+			}
+			
+			TransitionState=1;
 		}
 	}
 }
@@ -233,7 +270,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 		
 		
 		currentState=NewState;
-		TransitionState=1;
+		TransitionState=-1;
 		TransitionStartMicros=micros();
 	}
 	
@@ -255,8 +292,8 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 			setMachineState(0);
 			happyMachine=1;
 		}
-	}else if(TransitionState!=0){
-		printer->println("mid Transition");
+	}else if(TransitionState<0){
+		//printer->println("mid Transition");
 		
 	}else if (happyMachine!=1){
 		printer->println("not happy!");
@@ -288,8 +325,8 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 			if (switch2==0){
 				setMachineState(3);
 			}else if (switch2>0){
-			
-				if (currentState==6){ 
+				
+				if (currentState==5 or currentState==6){ 
 					if (switch5==2){
 						setMachineState(7);
 					}
@@ -298,7 +335,7 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 				}
 			}
 			
-		}else if (currentState==3 and TransitionState ==0){
+		}else if (currentState==3 and TransitionState >-1){
 		// at rest
 			if (switch3==2 and switch2==0 ){
 				// active retract from rest
