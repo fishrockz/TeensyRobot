@@ -8,9 +8,10 @@ const int DebugLevel=00;
 
 const uint32_t PPMPin = 10;//only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 const uint32_t boardLEDPin = 13;
+const uint32_t FETLEDPin = 9;
 
-
-
+unsigned int flashingTimer1=0;
+unsigned int flashingTimer2=0;
 
 StateMachineClass theWeapon(Serial);
 PulsePositionInput RadioIn;
@@ -19,6 +20,10 @@ void setup() {
 	RadioIn.begin(PPMPin);
 	theWeapon.EnableStateMachine();
 	theWeapon.externalRequest(0);
+	
+	pinMode(boardLEDPin,OUTPUT);
+	pinMode(FETLEDPin,OUTPUT);
+	//PinMode(ValvePins[valveII],OUTPUT);
 	
 }
 
@@ -74,12 +79,39 @@ void twoSwitchesFromChan(int chanel,int &switchA,int &switchB) {
 }
 
 
+unsigned int flashstate1=0;
+unsigned int flashstate2=0;
+
+
+
 void loop() {
   // put your main code here, to run repeatedly:
 	//theWeapon.foo();
 	
 	theWeapon.tickFunction();
 	
+	int tmptime=millis();
+	if (flashingTimer1+2000 < tmptime){
+		if (flashstate1 == 1){
+			flashstate1=0;
+		}else{
+			flashstate1=1;
+		}
+		digitalWrite(boardLEDPin,flashstate1);
+		flashingTimer1=millis();
+	}
+	
+	
+	
+	if (flashingTimer2+2000 < tmptime){
+		if (flashstate2 == 1){
+			flashstate2=0;
+		}else{
+			flashstate2=1;
+		}
+		digitalWrite(FETLEDPin,flashstate2);
+		flashingTimer2=millis();
+	}
 	
 	
 	int num = RadioIn.available();

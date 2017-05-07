@@ -12,11 +12,11 @@ const int numberOfValues=5;
 
 /* dougs */
 const int ValvePins[numberOfValues] = {
-/*Valve A*/  9,
-/*Valve B*/  6,
-/*Valve C*/  5,
-/*Valve D*/  4,
-/*Valve E*/  7
+/*Valve A*/  4,
+/*Valve B*/  5,
+/*Valve C*/  6,
+/*Valve D*/  7,
+/*Valve E*/  8
 
 };
 
