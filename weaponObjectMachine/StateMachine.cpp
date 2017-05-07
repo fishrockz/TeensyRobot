@@ -97,7 +97,7 @@ const int AutoTransitionTo[numberofStates] = {
 /* 5 - Ready to Fire */		6,
 /* 6 - Waiting to Fire */	-1,
 /* 7 - Fire */			8,
-/* 8 - Fired */			-1,
+/* 8 - Fired */			1,
 };
 
 
@@ -264,7 +264,7 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 	}else if (switch1==1){
 	// normal active mode
 	//4568
-		if (currentState==0 or currentState==2 or currentState==4 or currentState==5 or currentState==6 or currentState==8){
+		if (currentState==0 or currentState==2 ){
 			// go to rest from safe.
 			if (switch2==0 and (switch3==0 or switch3==1) and switch5==0){
 				// switch 4 is which control mode we are in so it dosnet mater.
@@ -273,8 +273,31 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 				printer->println("we can go to state 3 now");
 				setMachineState(3);
 			}else{
-				printer->println("not going to rest due to other switches");
+				if (currentState==0){
+					printer->println("not going to rest due to other switches");
+				}else if (currentState==2){
+					if (switch2==2 and (switch3==0 or switch3==1) and switch5==0){
+						//if switch3==1 then the extra time in two is in the min time so we dont get hear until the extended min time has been used.
+						setMachineState(4);
+					
+					}
+				}
 			}
+		}else if (currentState==4 or currentState==5 or currentState==6 or currentState==8){
+			// if in state 2 or 8 but less than min time then we will be in TransitionState and not get hear
+			if (switch2==0){
+				setMachineState(3);
+			}else if (switch2>0){
+			
+				if (currentState==6){ 
+					if (switch5==2){
+						setMachineState(7);
+					}
+								
+				
+				}
+			}
+			
 		}else if (currentState==3 and TransitionState ==0){
 		// at rest
 			if (switch3==2 and switch2==0 ){
@@ -285,12 +308,18 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 			
 				setMachineState(4);
 			}
-		}else if (currentState==3){	
+		
+			
+			
 			
 		}else{
 			//setMachineState(0);
 		}
-	
+		
+		
+		
+		
+		
 	}else if (switch1==2){
 		TelemiteryMode=1;
 		//printer->println("elemiteryMode=1;");
