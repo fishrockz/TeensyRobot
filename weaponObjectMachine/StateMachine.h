@@ -12,9 +12,12 @@ public:
   StateMachineClass( usb_serial_class &print );
 void tickFunction();
 void  debugFunction();
+void EnableStateMachine();
+void externalRequest(int NewState);
   private:
     usb_serial_class* printer;  
-  int DebugLevel=0;
+  int happyMachine=-1;
+  int DebugLevel=22;
   void setMachineState(int NewState);
   int currentState=0;
   int TransitionState=0;

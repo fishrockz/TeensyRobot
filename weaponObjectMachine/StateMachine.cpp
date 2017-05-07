@@ -9,12 +9,14 @@ const int numberOfValues=5;
 // ValveDPin = 6;// buffer exhaust
 // ValveEPin = 9;// chamber exhaust
 
+
+/* dougs */
 const int ValvePins[numberOfValues] = {
-/*Valve A*/  3,
-/*Valve B*/  4,
+/*Valve A*/  9,
+/*Valve B*/  6,
 /*Valve C*/  5,
-/*Valve D*/  6,
-/*Valve E*/  9
+/*Valve D*/  4,
+/*Valve E*/  7
 
 };
 
@@ -63,27 +65,42 @@ const int ValueState[numberofStates][numberOfValues] = {
 const char *StateNames[numberofStates] = { "Safe State", "Retract/fill Buffer", "Expand Buffer","Rest","Arming","Ready to Fire","Waiting to Fire","Fire","Fired"}; 
 
 const int StateLeadinTimes[numberofStates] = { 
-/* Safe State */	10000, 
+/* Safe State */		10000, 
 /* Retract/fill Buffer */	10000, 
-/* Retract wait */	10000, 
-/* Rest */	10000, 
-/* Arming */	10000, 
-/*  */	10000,
-/*  */	10000,
-/* Fire */	10000,
-/* Fired */	10000,
+/* Retract wait */		10000, 
+/* Rest */			10000, 
+/* Arming */			10000, 
+/* Ready to Fire */		10000,
+/* Waiting to Fire */		10000,
+/* Fire */			10000,
+/* Fired */			10000,
 };
 const int StateMinTimes[numberofStates] = { 
-/* Safe State */	100000, 
+/* Safe State */		100000, 
 /* Retract/fill Buffer */	100000, 
-/* Retract wait */	100000, 
-/* Rest */	100000, 
-/* Arming */	100000, 
-/*  */	100000,
-/*  */	100000,
-/* Fire */	100000,
-/* Fired */	100000,
+/* Retract wait */		100000, 
+/* Rest */			100000, 
+/* Arming */			100000, 
+/* Ready to Fire */		100000,
+/* Waiting to Fire */		100000,
+/* Fire */			100000,
+/* Fired */			100000,
 };
+
+
+const int AutoTransitionTo[numberofStates] = { 
+/* 0 - Safe State */		-1, 
+/* 1 - Retract/fill Buffer */	2, 
+/* 2 - Retract wait */		-1, 
+/* 3 - Rest */			-1, 
+/* 4 - Arming */		5, 
+/* 5 - Ready to Fire */		6,
+/* 6 - Waiting to Fire */	-1,
+/* 7 - Fire */			8,
+/* 8 - Fired */			-1,
+};
+
+
 
 //State Machine
 
@@ -121,13 +138,13 @@ StateMachineClass::StateMachineClass( usb_serial_class &print ) {
 }  
 
 
-void StateMachineClass::setMachineState( int NewState ) { 
+void StateMachineClass::EnableStateMachine( ) { 
   
   
   	
 	for ( int valveII;valveII< numberOfValues;valveII++){
 		//digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
-		pinMode(ValvePins[valveII],OUTPUT)
+		pinMode(ValvePins[valveII],OUTPUT);
 	}
 //for( int valveII = 0; valveII < numberOfValues; valveII += 1 ) {
 //		);
@@ -145,6 +162,12 @@ printer->print(">");
 printer->print("<TransitionState=");
 printer->print(TransitionState);
 printer->print(">");
+printer->print("<happyMachine=");
+printer->print(happyMachine);
+printer->print(">");
+
+
+
 printer->println("</ TelemPacket>");
 }
 
@@ -165,20 +188,30 @@ void StateMachineClass::tickFunction(void ){
 	
 	if(TransitionState!=0){
 		int tmpContInfo=(this->*ContinueState[currentState])(0);
-		printer->print("StateMachineClass::tickFunction transition test ");
-		printer->println(tmpContInfo);
+		//printer->print("StateMachineClass::tickFunction transition test ");
+		//printer->println(tmpContInfo);
 		
 		if (tmpContInfo!=-3)
 		{
-		TransitionState=0;
-		printer->print("StateMachineClass::tickFunction now at State ");
-		printer->print(currentState);
-		printer->print(" ");
-		printer->println(StateNames[currentState]);
+			TransitionState=0;
+			printer->print("StateMachineClass::tickFunction now at State ");
+			printer->print(currentState);
+			printer->print(" ");
+			printer->println(StateNames[currentState]);
 		
-		
-		
+			if (AutoTransitionTo[currentState]>-1){
+				setMachineState(AutoTransitionTo[currentState]);
+			}
 		}
+	}
+}
+
+
+void StateMachineClass::externalRequest( int NewState ) { 
+	if (NewState==0){
+		setMachineState ( NewState );
+	}else{
+		// this is worth considering maybe via some kind of merge of updateSwitches
 	}
 }
 
@@ -217,12 +250,21 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 	
 	if (switch1==0){
 		setMachineState(0);
-		
+		if (happyMachine!=1 and switch1==0 and switch2==0 and (switch3==0 or switch3==1) and switch5==0){
+			printer->println("now I'm happy! :)");
+			setMachineState(0);
+			happyMachine=1;
+		}
 	}else if(TransitionState!=0){
 		printer->println("mid Transition");
+		
+	}else if (happyMachine!=1){
+		printer->println("not happy!");
+		
 	}else if (switch1==1){
 	// normal active mode
-		if (currentState==0){
+	//4568
+		if (currentState==0 or currentState==2 or currentState==4 or currentState==5 or currentState==6 or currentState==8){
 			// go to rest from safe.
 			if (switch2==0 and (switch3==0 or switch3==1) and switch5==0){
 				// switch 4 is which control mode we are in so it dosnet mater.
@@ -231,7 +273,7 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 				printer->println("we can go to state 3 now");
 				setMachineState(3);
 			}else{
-				printer->println("not arming due to other switches");
+				printer->println("not going to rest due to other switches");
 			}
 		}else if (currentState==3 and TransitionState ==0){
 		// at rest

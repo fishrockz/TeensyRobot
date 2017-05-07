@@ -4,7 +4,7 @@
 //Custom Robot Libarys
 #include "weaponObjectMachine.h" 
 
-const int DebugLevel=0;
+const int DebugLevel=00;
 
 const uint32_t PPMPin = 10;//only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 const uint32_t boardLEDPin = 13;
@@ -16,12 +16,11 @@ StateMachineClass theWeapon(Serial);
 PulsePositionInput RadioIn;
 void setup() {
   // put your setup code here, to run once:
-	RadioIn.begin(9);
-	
-	theWeapon.setState(0)
+	RadioIn.begin(PPMPin);
+	theWeapon.EnableStateMachine();
+	theWeapon.externalRequest(0);
 	
 }
-
 
 
 int ValidPPMdata=-1;
@@ -108,7 +107,7 @@ void loop() {
 		theWeapon.updateSwitches(switch1,switch2,switch3,switch4,switch5);
 		
 		
-		//if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
+		if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
 	}
 	
 	
