@@ -8,7 +8,7 @@ const int DebugLevel=00;
 
 const uint32_t PPMPin = 10;//only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 const uint32_t boardLEDPin = 13;
-const uint32_t FETLEDPin = 9;
+//const uint32_t FETLEDPin = 9;
 
 unsigned int flashingTimer1=0;
 unsigned int flashingTimer2=0;
@@ -22,7 +22,7 @@ void setup() {
 	theWeapon.externalRequest(0);
 	
 	pinMode(boardLEDPin,OUTPUT);
-	pinMode(FETLEDPin,OUTPUT);
+	//pinMode(FETLEDPin,OUTPUT);
 	//PinMode(ValvePins[valveII],OUTPUT);
 	
 }
@@ -103,7 +103,7 @@ void loop() {
 	
 	
 	
-	if (flashingTimer2+2000 < tmptime){
+/*	if (flashingTimer2+2000 < tmptime){
 		if (flashstate2 == 1){
 			flashstate2=0;
 		}else{
@@ -111,7 +111,7 @@ void loop() {
 		}
 		digitalWrite(FETLEDPin,flashstate2);
 		flashingTimer2=millis();
-	}
+	}*/
 	
 	
 	int num = RadioIn.available();

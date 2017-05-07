@@ -2,13 +2,13 @@
 
 
 //Value Stuff
-const int numberOfValues=5;
+const int numberOfValues=6;
 // ValveAPin = 3;// chamber fill port
 // ValveBPin = 4;// main pilot exhaust
 // ValveCPin = 5;// buffer fill
 // ValveDPin = 6;// buffer exhaust
 // ValveEPin = 9;// chamber exhaust
-
+// ValveA2Pin = 3;// chamber fill port
 
 /* dougs */
 const int ValvePins[numberOfValues] = {
@@ -16,8 +16,8 @@ const int ValvePins[numberOfValues] = {
 /*Valve B*/  5,
 /*Valve C*/  6,
 /*Valve D*/  7,
-/*Valve E*/  8
-
+/*Valve E*/  8,
+/*Valve A2*/  9
 };
 
 
@@ -27,6 +27,7 @@ const int reversvalue [numberOfValues] = {
 /*Valve C*/  0,
 /*Valve D*/  0,
 /*Valve E*/  0,
+/*Valve A2*/  1,
 };
 
 //state stuff
@@ -34,31 +35,31 @@ const int numberofStates=9;
 
 const int ValueState[numberofStates][numberOfValues] = {
 /* 0 -- Safe State */ 
-{0, 0, 0, 1, 1}, 
+{0, 0, 0, 1, 1, 0}, 
 
 /* 1 -- Retract/fill Buffer */
-{0, 0, 1, 0, 1}, 
+{0, 0, 1, 0, 1, 0}, 
 
 /* 2 -- Expand Buffer */
-{0, 0, 0, 0, 1}, 
+{0, 0, 0, 0, 1, 0}, 
 
 /* 3 -- Rest */
-{0, 0, 0, 0, 1}, 
+{0, 0, 0, 0, 1, 0}, 
 
 /* 4 -- Arming */
-{1, 0, 0, 1, 0}, 
+{1, 0, 0, 1, 0, 1}, 
 
 /* 5 -- Ready to Fire */
-{1, 0, 0, 0, 0},
+{1, 0, 0, 0, 0, 1},
 
 /* 6 -- Waiting to Fire */
-{0, 0, 0, 0, 0}, 
+{0, 0, 0, 0, 0, 0}, 
 
 /* 7 -- Fire */
-{0, 1, 0, 0, 0},
+{0, 1, 0, 0, 0, 0},
 
 /* 8 -- Fired */
-{0, 0, 0, 0, 1},
+{0, 0, 0, 0, 1, 0},
 };
 
 
@@ -83,7 +84,7 @@ const int StateMinTimes[numberofStates] = {
 /* Arming */			3000000, 
 /* Ready to Fire */		10000,
 /* Waiting to Fire */		10000,
-/* Fire */			10000,
+/* Fire */			500000,
 /* Fired */			1000000,
 };
 
@@ -253,12 +254,16 @@ void StateMachineClass::externalRequest( int NewState ) {
 }
 
 void StateMachineClass::setMachineState( int NewState ) { 
-  
+ 	 int PinVal;
   
   	
 	for ( int valveII;valveII< numberOfValues;valveII++){
 		//digitalWrite(valveII,ValueState[NewState][valveII]);
-		digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
+		PinVal=ValueState[NewState][valveII];
+		if (reversvalue[valveII]==1){
+			if (PinVal==1) {PinVal=0;}else{PinVal=1;}
+		}
+		digitalWrite(ValvePins[valveII],PinVal);
 	}
 	
 	if (NewState!=currentState){
