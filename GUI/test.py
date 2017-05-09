@@ -177,7 +177,9 @@ class mysillyPics(QtGui.QWidget):
 			items=striped.split('><')[1:-1]
 			items=map(lambda x: x.split('='), items)
 			print 'items',items
-			
+			for item in items:
+				if item[0].split('-')[0]=='ValveII':
+					print item[1]
 			
 		#except:
 		#	pass

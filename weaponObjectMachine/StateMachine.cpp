@@ -173,21 +173,30 @@ void StateMachineClass::EnableStateMachine( ) {
 
 void StateMachineClass::debugFunction(void ){
 
-printer->print("StateMachineClass::debugFunction");
-printer->print("<TelemPacket>");
-printer->print("<State=");
-printer->print(currentState);
-printer->print(">");
-printer->print("<TransitionState=");
-printer->print(TransitionState);
-printer->print(">");
-printer->print("<happyMachine=");
-printer->print(happyMachine);
-printer->print(">");
+	printer->print("StateMachineClass::debugFunction");
+	printer->print("<TelemPacket>");
+	printer->print("<State=");
+	printer->print(currentState);
+	printer->print(">");
+	printer->print("<TransitionState=");
+	printer->print(TransitionState);
+	printer->print(">");
+	printer->print("<happyMachine=");
+	printer->print(happyMachine);
+	printer->print(">");
 
 
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		printer->print("<ValveII-");
+		printer->print(valveII);
+		printer->print("=");
+		printer->print(ValueState[currentState][valveII]);
+		printer->print(">");
+		
+	} 
 
-printer->println("</ TelemPacket>");
+
+	printer->println("</ TelemPacket>");
 }
 
 
@@ -303,7 +312,7 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 	}else if (happyMachine!=1){
 		printer->println("not happy!");
 		
-	}else if (switch1==1){
+	}else if (switch1>0){
 	// normal active mode
 	//4568
 		if (currentState==0 or currentState==2 ){
@@ -361,8 +370,8 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 		
 		
 		
-		
-	}else if (switch1==2){
+	}	
+	if (switch1==2){
 		TelemiteryMode=1;
 		//printer->println("elemiteryMode=1;");
 	}
