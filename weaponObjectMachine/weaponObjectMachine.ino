@@ -115,6 +115,7 @@ void loop() {
 	
 	
 	int num = RadioIn.available();
+	//if (DebugLevel>20){Serial.print("radio vail");Serial.println(num);}
 	if (num == 8) {
 
 		valRadio1 = RadioIn.read(5);
