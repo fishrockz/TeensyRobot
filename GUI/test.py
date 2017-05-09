@@ -56,7 +56,7 @@ class mysillyPics(QtGui.QWidget):
 		
 		self.pixmapA = QtGui.QPixmap("valveA.png")#.scaled(16, 16, QtCore.Qt.KeepAspectRatio)
 		self.pixmapB = QtGui.QPixmap("valveB.png")
-		
+		self.ValvePixmaps=[self.pixmapA,self.pixmapB]
 		if 0:
 			self.pixItem = QtGui.QGraphicsPixmapItem(self.pixmapA)
 		
@@ -157,13 +157,13 @@ class mysillyPics(QtGui.QWidget):
 		
 		
 	def addValue(self,x,y):
-		self.pixItem = QtGui.QGraphicsPixmapItem(self.pixmapA)
+		pixItem = QtGui.QGraphicsPixmapItem(self.pixmapA)
 		
-		self.pixItem.translate(x-10,y-10)
-		self.pixItem.setScale(0.15)
-		self.scn.addItem(self.pixItem)
+		pixItem.translate(x-10,y-10)
+		pixItem.setScale(0.15)
+		self.scn.addItem(pixItem)
 	
-		self.valves.append({'Gui':None})
+		self.valves.append({'Gui':pixItem})
 	def SerialRecive(self,info):
 		print 'silly GUI SerialRecive',info
 		info=str(info)
@@ -178,8 +178,10 @@ class mysillyPics(QtGui.QWidget):
 			items=map(lambda x: x.split('='), items)
 			print 'items',items
 			for item in items:
-				if item[0].split('-')[0]=='ValveII':
+				valveinfo=item[0].split('-')
+				if valveinfo[0]=='ValveII':
 					print item[1]
+					self.valves[int(valveinfo[1])]['Gui'].setPixmap(self.ValvePixmaps[int(item[1])])
 			
 		#except:
 		#	pass
