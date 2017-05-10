@@ -38,7 +38,8 @@ class myOutputText(QtGui.QWidget):
 		sb = logOutput.verticalScrollBar()
 		sb.setValue(sb.maximum())
 	def SerialRecive(self,info):
-		print 'SerialRecive'
+		pass
+		#print 'SerialRecive'
 		
 class mysillyPics(QtGui.QWidget):
 	def __init__(self,parent=None):
@@ -152,7 +153,7 @@ class mysillyPics(QtGui.QWidget):
 		self.addValue(50,100)
 		
 		self.addValue(280,-100)
-		
+		self.addValue(350,120)
 		self.setLayout(MainLayout)
 		
 		
@@ -165,13 +166,13 @@ class mysillyPics(QtGui.QWidget):
 	
 		self.valves.append({'Gui':pixItem})
 	def SerialRecive(self,info):
-		print 'silly GUI SerialRecive',info
+		print 'SerialRecive:',info
 		info=str(info)
 		#self.pixItemB.setPixmap(self.pixmapB)
 		striped=''
 		state=None
 		#try:
-		if 1:
+		if '<TelemPacket>' in info:
 			
 			striped='>'+info.split('<TelemPacket>')[1].split('</ TelemPacket>')[0]+'<'
 			items=striped.split('><')[1:-1]
@@ -180,15 +181,32 @@ class mysillyPics(QtGui.QWidget):
 			for item in items:
 				valveinfo=item[0].split('-')
 				if valveinfo[0]=='ValveII':
-					print item[1]
+					print int(valveinfo[1]),item[1]
 					self.valves[int(valveinfo[1])]['Gui'].setPixmap(self.ValvePixmaps[int(item[1])])
-			
+					
+				if item[0]=='Sensor1':
+					colrange=float(item[1])/60.
+					print 'Sensor1',colrange
+					if colrange>1:colrange=1
+					if colrange<0:colrange=0
+					
+					self.brushDelt1.setColor(QtGui.QColor(0,50,int(30+colrange*200)))
+					self.pressuerSenceA1.setBrush(self.brushDelt1)
+					self.pressuerSenceB1.setBrush(self.brushDelt1)
+				if item[0]=='Sensor2':
+					colrange=float(item[1])/60.
+					print 'Sensor2',colrange
+					if colrange>1:colrange=1
+					if colrange<0:colrange=0
+					self.brushDelt1.setColor(QtGui.QColor(0,50,int(20+colrange*200)))
+					self.pressuerSenceA2.setBrush(self.brushDelt1)					
+					self.pressuerSenceB2.setBrush(self.brushDelt1)
+		else:
+			print "NO telem; info: ",info
 		#except:
 		#	pass
 
-		self.brushDelt1.setColor(QtGui.QColor(0,50,100))
-		self.pressuerSenceA1.setBrush(self.brushDelt1)
-		self.pressuerSenceA2.setBrush(self.brushDelt1)
+
 		
 		self.view.updateScene([self.view.sceneRect(),])
 		self.view.update()
@@ -199,10 +217,10 @@ class ConnectStuff(QtGui.QWidget):
 	def __init__(self,parent=None):
 		super(ConnectStuff, self).__init__(parent)
 		layout = QtGui.QVBoxLayout()
-		self.b1 = QtGui.QPushButton("Connect")
-		self.b1.clicked.connect(self.setoffTimer)
-		self.b2 = QtGui.QPushButton("Go")
-		self.b2.clicked.connect(self.setoffTimer)
+		self.b1 = QtGui.QPushButton("ACM")
+		self.b1.clicked.connect(self.setoffACM)
+		self.b2 = QtGui.QPushButton("USB")
+		self.b2.clicked.connect(self.setoffUSB)
 		#self.b1.clicked.connect(self.btnstate)
 		layout.addWidget(self.b1)
 		layout.addWidget(self.b2)
@@ -215,17 +233,25 @@ class ConnectStuff(QtGui.QWidget):
 		self.serial = None
 		self.timer.timeout.connect(self.tick)
 		self.timer.start(1000)
-	def setoffTimer(self):
+	def setoffACM(self):
 		print "hi there"
 		try:
 			self.serial = serial.Serial('/dev/ttyACM0')
+			#self.serial = serial.Serial('/dev/ttyUSB0')
 			self.serial.timeout = 0.001
 		except:
 			pass
-		
+	def setoffUSB(self):
+		print "hi there"
+		try:
+			#self.serial = serial.Serial('/dev/ttyACM0')
+			self.serial = serial.Serial('/dev/ttyUSB0')
+			self.serial.timeout = 0.001
+		except:
+			pass		
 		
 	def tick(self):
-		print 'tick',self.serial
+		#print 'tick',self.serial
 		newline=''
 		if self.serial !=None:
 			try:
@@ -238,7 +264,7 @@ class ConnectStuff(QtGui.QWidget):
 			except:
 				pass
 		self.SerialDataOut.emit(newline)
-		print 'newline :',newline
+		#print 'newline :',newline
 
 
 class myWidget(QtGui.QMainWindow):

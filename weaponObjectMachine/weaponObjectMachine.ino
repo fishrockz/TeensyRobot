@@ -13,11 +13,13 @@ const uint32_t boardLEDPin = 13;
 unsigned int flashingTimer1=0;
 unsigned int flashingTimer2=0;
 
-StateMachineClass theWeapon(Serial);
+StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
 void setup() {
   // put your setup code here, to run once:
 	RadioIn.begin(PPMPin);
+	Serial1.begin(115200);
+	
 	theWeapon.EnableStateMachine();
 	theWeapon.externalRequest(0);
 	

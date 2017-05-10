@@ -149,13 +149,19 @@ const IntFunctionWithOneParameter ContinueState [numberofStates] = {
 
 
 
-
+/*
 StateMachineClass::StateMachineClass( usb_serial_class &print ) { 
       printer = &print; //operate on the adress of print
 
       
 }  
+*/
 
+StateMachineClass::StateMachineClass( usb_serial_class &print,HardwareSerial &print2 ) { 
+      printer = &print; //operate on the adress of print
+printerHW = &print2;
+      
+}
 
 void StateMachineClass::EnableStateMachine( ) { 
   
@@ -170,7 +176,7 @@ void StateMachineClass::EnableStateMachine( ) {
 //	}
 	
 }  
-
+/*
 void StateMachineClass::debugFunction(void ){
 
 	printer->print("StateMachineClass::debugFunction");
@@ -184,7 +190,12 @@ void StateMachineClass::debugFunction(void ){
 	printer->print("<happyMachine=");
 	printer->print(happyMachine);
 	printer->print(">");
-
+	printer->print("<Sensor1=");
+	printer->print(Sensor1);
+	printer->print(">");
+	printer->print("<Sensor2=");
+	printer->print(Sensor2);
+	printer->print(">");
 
 	for ( int valveII;valveII< numberOfValues;valveII++){
 		printer->print("<ValveII-");
@@ -198,19 +209,145 @@ void StateMachineClass::debugFunction(void ){
 
 	printer->println("</ TelemPacket>");
 }
+*/
+void StateMachineClass::debugFunction(void ){
+
+	//if (debugHW==1){
+		printerHW->print("StateMachineClass::debugFunction");
+		printerHW->print("<TelemPacket>");
+		printerHW->print("<State=");
+		printerHW->print(currentState);
+		printerHW->print(">");
+		printerHW->print("<TransitionState=");
+		printerHW->print(TransitionState);
+		printerHW->print(">");
+		printerHW->print("<happyMachine=");
+		printerHW->print(happyMachine);
+		printerHW->print(">");
+		printerHW->print("<Sensor1=");
+		printerHW->print(Sensor1);
+		printerHW->print(">");
+		printerHW->print("<Sensor2=");
+		printerHW->print(Sensor2);
+		printerHW->print(">");
+
+		for ( int valveII;valveII< numberOfValues;valveII++){
+			printerHW->print("<ValveII-");
+			printerHW->print(valveII);
+			printerHW->print("=");
+			printerHW->print(ValueState[currentState][valveII]);
+			printerHW->print(">");
+		
+		} 
 
 
+		printerHW->println("</ TelemPacket>");
+	
+	//}else{
+		printer->print("StateMachineClass::debugFunction");
+		printer->print("<TelemPacket>");
+		printer->print("<State=");
+		printer->print(currentState);
+		printer->print(">");
+		printer->print("<TransitionState=");
+		printer->print(TransitionState);
+		printer->print(">");
+		printer->print("<happyMachine=");
+		printer->print(happyMachine);
+		printer->print(">");
+		printer->print("<Sensor1=");
+		printer->print(Sensor1);
+		printer->print(">");
+		printer->print("<Sensor2=");
+		printer->print(Sensor2);
+		printer->print(">");
+
+		for ( int valveII;valveII< numberOfValues;valveII++){
+			printer->print("<ValveII-");
+			printer->print(valveII);
+			printer->print("=");
+			printer->print(ValueState[currentState][valveII]);
+			printer->print(">");
+		
+		} 
+
+
+		printerHW->println("</ TelemPacket>");
+	
+	
+	
+	//}
+}
+
+void StateMachineClass::debugFunction(HardwareSerial MySerial ){
+
+	MySerial.print("StateMachineClass::debugFunction");
+	MySerial.print("<TelemPacket>");
+	MySerial.print("<State=");
+	MySerial.print(currentState);
+	MySerial.print(">");
+	MySerial.print("<TransitionState=");
+	MySerial.print(TransitionState);
+	MySerial.print(">");
+	MySerial.print("<happyMachine=");
+	MySerial.print(happyMachine);
+	MySerial.print(">");
+	MySerial.print("<Sensor1=");
+	MySerial.print(Sensor1);
+	MySerial.print(">");
+	MySerial.print("<Sensor2=");
+	MySerial.print(Sensor2);
+	MySerial.print(">");
+
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		MySerial.print("<ValveII-");
+		MySerial.print(valveII);
+		MySerial.print("=");
+		MySerial.print(ValueState[currentState][valveII]);
+		MySerial.print(">");
+		
+	} 
+
+
+	MySerial.println("</ TelemPacket>");
+}
+
+
+float readPressureSensor(int pin){
+
+	int val = analogRead(2);
+	// 5 122
+	// 2.5 96
+	// minimum seen: 20
+	float voltage = (float)val / 1024 * 3.3;
+	float pressure = voltage * 3.2 / 1 /10 * 60;
+	return pressure;
+
+}
 void StateMachineClass::tickFunction(void ){
 	
 	if (TelemiteryMode==1){
 		//printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
 		// telemitry mode, bit like a debug mode, so spit sutuff out a few times a second
-		int tmpmillis=millis();
-		if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
+		
+		
+		// dont do this on the time critical, ie, 1 and 7
+		if (currentState==0 or currentState==2 or currentState==3 or currentState==4 or currentState==5 or currentState==6 or currentState==8 or currentState==9){
+			int tmpmillis=millis();
+			if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
 			
-			printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
-			debugFunction();
-			telemMillis=millis();
+				printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
+				
+				
+				
+				Sensor1=readPressureSensor(2);
+				Sensor2=readPressureSensor(3);
+				
+				
+				debugFunction();
+			
+				telemMillis=millis();
+			}
 		}
 	}
 	
