@@ -174,7 +174,7 @@ class mysillyPics(QtGui.QWidget):
 		#try:
 		if '<TelemPacket>' in info:
 			
-			striped='>'+info.split('<TelemPacket>')[1].split('</ TelemPacket>')[0]+'<'
+			striped='>'+info.split('<TelemPacket>')[-1].split('</ TelemPacket>')[0]+'<'
 			items=striped.split('><')[1:-1]
 			items=map(lambda x: x.split('='), items)
 			print 'items',items
@@ -229,10 +229,12 @@ class ConnectStuff(QtGui.QWidget):
 		self.console=None
 #		try:
 ##			self.SerialConnn
-		
+		self.serialSream=''
 		self.serial = None
 		self.timer.timeout.connect(self.tick)
 		self.timer.start(1000)
+		
+		
 	def setoffACM(self):
 		print "hi there"
 		try:
@@ -245,7 +247,7 @@ class ConnectStuff(QtGui.QWidget):
 		print "hi there"
 		try:
 			#self.serial = serial.Serial('/dev/ttyACM0')
-			self.serial = serial.Serial('/dev/ttyUSB0')
+			self.serial = serial.Serial('/dev/ttyUSB0',baudrate=57600)
 			self.serial.timeout = 0.001
 		except:
 			pass		
@@ -263,7 +265,12 @@ class ConnectStuff(QtGui.QWidget):
 				
 			except:
 				pass
-		self.SerialDataOut.emit(newline)
+		self.serialSream+=newline
+		if (	'<TelemPacket>'in self.serialSream) and('</ TelemPacket>'in self.serialSream):
+		
+		
+			self.SerialDataOut.emit(self.serialSream)
+			self.serialSream=''
 		#print 'newline :',newline
 
 

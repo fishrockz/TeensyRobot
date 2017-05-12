@@ -18,7 +18,9 @@ PulsePositionInput RadioIn;
 void setup() {
   // put your setup code here, to run once:
 	RadioIn.begin(PPMPin);
-	Serial1.begin(115200);
+	//Serial1.begin(115200);
+	Serial1.begin(57600);
+	//Serial1.begin(9600);
 	
 	theWeapon.EnableStateMachine();
 	theWeapon.externalRequest(0);

@@ -24,7 +24,7 @@ const int ValvePins[numberOfValues] = {
 const int reversvalue [numberOfValues] = { 
 /*Valve A*/  0,
 /*Valve B*/  0,
-/*Valve C*/  0,
+/*Valve C*/  1,
 /*Valve D*/  0,
 /*Valve E*/  0,
 /*Valve A2*/  1,
@@ -59,7 +59,7 @@ const int ValueState[numberofStates][numberOfValues] = {
 {0, 1, 0, 0, 0, 0},
 
 /* 8 -- Fired */
-{0, 0, 0, 0, 1, 0},
+{0, 1, 0, 0, 1, 0},
 };
 
 
@@ -84,7 +84,7 @@ const int StateMinTimes[numberofStates] = {
 /* Arming */			10000, 
 /* Ready to Fire */		10000,
 /* Waiting to Fire */		10000,
-/* Fire */			500000,
+/* Fire */			20000,
 /* Fired */			1000000,
 };
 
