@@ -78,13 +78,13 @@ const int StateLeadinTimes[numberofStates] = {
 };
 const int StateMinTimes[numberofStates] = { 
 /* Safe State */		10000, 
-/* Retract/fill Buffer */	300000, 
-/* Retract wait */		2000000, 
+/* Retract/fill Buffer */	500000, // more please 0.5 or 1 seconds??
+/* Retract wait */		3000000, // 4 seconds of expand
 /* Rest */			10000, 
 /* Arming */			10000, 
 /* Ready to Fire */		10000,
 /* Waiting to Fire */		10000,
-/* Fire */			20000,
+/* Fire */			500000, // 0.5 to 1 second please
 /* Fired */			1000000,
 };
 
@@ -93,8 +93,8 @@ const int StateAutoTransitionTimes[numberofStates] = {
 /* Retract/fill Buffer */	10000, 
 /* Retract wait */		10000, 
 /* Rest */			10000, 
-/* Arming */			3000000, 
-/* Ready to Fire */		10000000,
+/* Arming */			5000000, // 5 seconds
+/* Ready to Fire */		20000000, // 7 seconds
 /* Waiting to Fire */		10000,
 /* Fire */			10000,
 /* Fired */			10000,
