@@ -11,15 +11,25 @@ const int numberOfValues=6;
 // ValveA2Pin = 3;// chamber fill port
 
 /* dougs */
+//const int ValvePins[numberOfValues] = {
+// /*Valve A*/  4,
+// /*Valve B*/  5,
+// /*Valve C*/  6,
+// /*Valve D*/  7,
+// /*Valve E*/  8,
+// /*Valve A2*/  9
+//}; 
+/* wills purple */
 const int ValvePins[numberOfValues] = {
-/*Valve A*/  4,
-/*Valve B*/  5,
-/*Valve C*/  6,
-/*Valve D*/  7,
-/*Valve E*/  8,
-/*Valve A2*/  9
+/*Valve A*/  23,
+/*Valve B*/  22,
+/*Valve C*/  21,
+/*Valve D*/  5,
+/*Valve E*/  6,
+/*Valve A2*/  37
+// /*Aux1 */    36
+// /*Aux1 */    38
 };
-
 
 const int reversvalue [numberOfValues] = { 
 /*Valve A*/  0,

@@ -1,43 +1,46 @@
-
-const uint32_t ValveAPin = 3;
-const uint32_t ValveBPin = 4;
-const uint32_t ValveCPin = 5;
-const uint32_t ValveDPin = 6;
-const uint32_t ValveEPin = 7;
-
+const int numberOfValues = 8;
+/* wills purple */
+const int ValvePins[numberOfValues] = {
+/*Valve A*/  23,
+/*Valve B*/  22,
+/*Valve C*/  21,
+/*Valve D*/  5,
+/*Valve E*/  6,
+/*Valve A2*/  37,
+ /*Aux1 */    36,
+ /*Aux1 */    38,
+};
+int LEDpin =13;
 void setup() {
   // put your setup code here, to run once:
-if (0==1){
-	digitalWrite(ValveAPin,HIGH); // this should be true anyway.
-	digitalWrite(ValveBPin,HIGH);
-	digitalWrite(ValveCPin,HIGH);
-	digitalWrite(ValveDPin,HIGH);
-	digitalWrite(ValveEPin,HIGH);
-}else if (1==0){
-	digitalWrite(ValveAPin,LOW); // this should be true anyway.
-	digitalWrite(ValveBPin,LOW);
-	digitalWrite(ValveCPin,LOW);
-	digitalWrite(ValveDPin,LOW);
-	digitalWrite(ValveEPin,LOW);
-}
 
 
-	pinMode(ValveAPin,OUTPUT); 
-	pinMode(ValveBPin,OUTPUT); 
-	pinMode(ValveCPin,OUTPUT); 
-	pinMode(ValveDPin,OUTPUT); 
-	pinMode(ValveEPin,OUTPUT); 
-delay(100);
-	digitalWrite(ValveAPin,HIGH); // this should be true anyway.
-	digitalWrite(ValveBPin,HIGH);
-	digitalWrite(ValveCPin,HIGH);
-	digitalWrite(ValveDPin,HIGH);
-	digitalWrite(ValveEPin,HIGH);
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		pinMode(valveII,OUTPUT); 
+	}
+	pinMode(LEDpin,OUTPUT); 
+	
 
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		digitalWrite(valveII,HIGH); 
+	}
+	digitalWrite(LEDpin,HIGH); 
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		digitalWrite(valveII,HIGH); 
+	}
+	digitalWrite(LEDpin,HIGH); 
+	delay(1000);
+
+	for ( int valveII;valveII< numberOfValues;valveII++){
+		digitalWrite(valveII,LOW); 
+	}
+	digitalWrite(LEDpin,LOW); 
+	delay(1000);
 }
