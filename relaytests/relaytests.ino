@@ -16,13 +16,13 @@ void setup() {
 
 
 	for ( int valveII;valveII< numberOfValues;valveII++){
-		pinMode(valveII,OUTPUT); 
+		pinMode(ValvePins[valveII],OUTPUT); 
 	}
 	pinMode(LEDpin,OUTPUT); 
 	
 
 	for ( int valveII;valveII< numberOfValues;valveII++){
-		digitalWrite(valveII,HIGH); 
+		digitalWrite(ValvePins[valveII],HIGH); 
 	}
 	digitalWrite(LEDpin,HIGH); 
 
@@ -33,13 +33,13 @@ void loop() {
 
 
 	for ( int valveII;valveII< numberOfValues;valveII++){
-		digitalWrite(valveII,HIGH); 
+		digitalWrite(ValvePins[valveII],HIGH); 
 	}
 	digitalWrite(LEDpin,HIGH); 
 	delay(1000);
 
 	for ( int valveII;valveII< numberOfValues;valveII++){
-		digitalWrite(valveII,LOW); 
+		digitalWrite(ValvePins[valveII],LOW); 
 	}
 	digitalWrite(LEDpin,LOW); 
 	delay(1000);
