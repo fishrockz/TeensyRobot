@@ -31,7 +31,7 @@ void externalRequest(int NewState);
   int currentState=0;
   int TransitionState=0;
   unsigned long TransitionStartMicros=0;
-  int TelemiteryMode=1;
+  int TelemetryMode=1;
   unsigned long telemMillis=0;
   unsigned long telemMillisRefreshRate=1000;
 };
