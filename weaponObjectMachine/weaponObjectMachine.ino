@@ -39,6 +39,12 @@ int valRadio1,valRadio2,valRadio3,valRadio4;
 int switch1,switch2,switch3,switch4,switch5;
 
 
+//switch1 0: safe            1: rest           2:
+//switch2 0: rest            1: single fire    2: multi fire
+//switch3 0: short retract   1: long retract   2: retract now
+//switch4 0: open loopA      1: open loopB     2: closed
+//switch5 0: rest            1:                2: fire
+
 
 int pot1;
 
@@ -144,3 +150,6 @@ void loop() {
 	}	
   	
 }
+
+
+
