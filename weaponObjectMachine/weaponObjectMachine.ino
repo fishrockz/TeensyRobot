@@ -1,12 +1,13 @@
-//Teensy libarys
+//Teensy libaries
 #include <PulsePosition.h>
 
-//Custom Robot Libarys
+//Custom Robot Libaries
 #include "weaponObjectMachine.h" 
+
 
 const int DebugLevel=00;
 
-const uint32_t PPMPin = 10;//only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
+const uint32_t PPMPin = 10;         //only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 const uint32_t boardLEDPin = 13;
 //const uint32_t FETLEDPin = 9;
 
@@ -15,8 +16,9 @@ unsigned int flashingTimer2=0;
 
 StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
+
 void setup() {
-  // put your setup code here, to run once:
+
 	RadioIn.begin(PPMPin);
 	//Serial1.begin(115200);
 	Serial1.begin(57600);
@@ -38,11 +40,7 @@ int switch1,switch2,switch3,switch4,switch5;
 
 
 
-
-
-
 int pot1;
-
 
 void oneSwitchFromChan(int chanel,int &switchA){
 
@@ -89,7 +87,7 @@ unsigned int flashstate2=0;
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  
 	//theWeapon.foo();
 	
 	theWeapon.tickFunction();
@@ -106,7 +104,6 @@ void loop() {
 	}
 	
 	
-	
 /*	if (flashingTimer2+2000 < tmptime){
 		if (flashstate2 == 1){
 			flashstate2=0;
@@ -119,19 +116,18 @@ void loop() {
 	
 	
 	int num = RadioIn.available();
-	//if (DebugLevel>20){Serial.print("radio vail");Serial.println(num);}
+	//if (DebugLevel>20){Serial.print("radio avail");Serial.println(num);}
 	if (num == 8) {
 
 		valRadio1 = RadioIn.read(5);
 		valRadio2 = RadioIn.read(6);
 		valRadio3 = RadioIn.read(7);
 		valRadio4 = RadioIn.read(8);
-		// we should validate the read values hear, if out side of 950 to 2050 then rasie error.
+		// We should validate the read values here. If outside of 950-2050us, then raise error.
 		
 		ValidPPMdata=1;
 		//if (DebugLevel>10){Serial.println(valArm);}
-		
-		
+				
 
 		if (DebugLevel>10){Serial.print(valRadio1);Serial.print(" ");Serial.print(valRadio2);Serial.print(" ");Serial.print(valRadio3);Serial.print(" ");Serial.println(valRadio4);}
 	
@@ -145,17 +141,6 @@ void loop() {
 		
 		
 		if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
+  	
 }

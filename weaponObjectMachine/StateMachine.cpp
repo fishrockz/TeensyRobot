@@ -3,31 +3,34 @@
 
 //Value Stuff
 const int numberOfValues=6;
-// ValveAPin = 3;// chamber fill port
-// ValveBPin = 4;// main pilot exhaust
-// ValveCPin = 5;// buffer fill
-// ValveDPin = 6;// buffer exhaust
-// ValveEPin = 9;// chamber exhaust
-// ValveA2Pin = 3;// chamber fill port
+// ValveAPin = 3;  // chamber fill port (NC)
+// ValveA2Pin = 3; // high flow chamber fill port (NO)
+// ValveBPin = 4;  // main pilot exhaust (NC)
+// ValveCPin = 5;  // buffer fill (NO)
+// ValveDPin = 6;  // buffer exhaust(NC)
+// ValveEPin = 9;  // chamber exhaust(NC)
 
-/* dougs */
+
+/* Doug's pinout*/
 const int ValvePins[numberOfValues] = {
 /*Valve A*/  4,
+/*Valve A2*/ 9,
 /*Valve B*/  5,
 /*Valve C*/  6,
 /*Valve D*/  7,
 /*Valve E*/  8,
-/*Valve A2*/  9
+
 };
 
 
 const int reversvalue [numberOfValues] = { 
 /*Valve A*/  0,
+/*Valve A2*/ 1,
 /*Valve B*/  0,
 /*Valve C*/  1,
 /*Valve D*/  0,
 /*Valve E*/  0,
-/*Valve A2*/  1,
+
 };
 
 //state stuff
@@ -66,52 +69,52 @@ const int ValueState[numberofStates][numberOfValues] = {
 const char *StateNames[numberofStates] = { "Safe State", "Retract/fill Buffer", "Expand Buffer","Rest","Arming","Ready to Fire","Waiting to Fire","Fire","Fired"}; 
 
 const int StateLeadinTimes[numberofStates] = { 
-/* Safe State */		10000, 
-/* Retract/fill Buffer */	10000, 
-/* Retract wait */		10000, 
-/* Rest */			10000, 
-/* Arming */			10000, 
-/* Ready to Fire */		10000,
-/* Waiting to Fire */		10000,
-/* Fire */			10000,
-/* Fired */			10000,
+/* Safe State */		        10000, 
+/* Retract/fill Buffer */   10000, 
+/* Retract wait */	        10000, 
+/* Rest */			            10000, 
+/* Arming */			          10000, 
+/* Ready to Fire */		      10000,
+/* Waiting to Fire */	  	  10000,
+/* Fire */			            10000,
+/* Fired */			            10000,
 };
 const int StateMinTimes[numberofStates] = { 
-/* Safe State */		10000, 
-/* Retract/fill Buffer */	500000, // more please 0.5 or 1 seconds??
-/* Retract wait */		3000000, // 4 seconds of expand
-/* Rest */			10000, 
-/* Arming */			10000, 
-/* Ready to Fire */		10000,
-/* Waiting to Fire */		10000,
-/* Fire */			500000, // 0.5 to 1 second please
-/* Fired */			1000000,
+/* Safe State */		        10000, 
+/* Retract/fill Buffer */	 500000, // 0.5 or 1 seconds??
+/* Retract wait */	    	3000000, // 4 seconds of expansion
+/* Rest */			            10000, 
+/* Arming */			          10000, 
+/* Ready to Fire */		      10000,
+/* Waiting to Fire */		    10000,
+/* Fire */			           500000, // 0.5 to 1 second
+/* Fired */			          1000000,
 };
 
 const int StateAutoTransitionTimes[numberofStates] = { 
-/* Safe State */		10000, 
-/* Retract/fill Buffer */	10000, 
-/* Retract wait */		10000, 
-/* Rest */			10000, 
-/* Arming */			3000000, // 5 seconds
-/* Ready to Fire */		10000, // 7 seconds
-/* Waiting to Fire */		10000,
-/* Fire */			10000,
-/* Fired */			10000,
+/* Safe State */		        10000, 
+/* Retract/fill Buffer */ 	10000, 
+/* Retract wait */	       	10000, 
+/* Rest */			            10000, 
+/* Arming */			        3000000, // 5 seconds
+/* Ready to Fire */		      10000, // 7 seconds
+/* Waiting to Fire */		    10000,
+/* Fire */			            10000,
+/* Fired */			            10000,
 };
 
 
 
 const int AutoTransitionTo[numberofStates] = { 
-/* 0 - Safe State */		-1, 
-/* 1 - Retract/fill Buffer */	2, 
-/* 2 - Retract wait */		-1, 
-/* 3 - Rest */			-1, 
-/* 4 - Arming */		5, 
-/* 5 - Ready to Fire */		6,
-/* 6 - Waiting to Fire */	-1,
-/* 7 - Fire */			8,
-/* 8 - Fired */			1,
+/* 0 - Safe State */		      -1, 
+/* 1 - Retract/fill Buffer */	 2, 
+/* 2 - Retract wait */		    -1, 
+/* 3 - Rest */		          	-1, 
+/* 4 - Arming */		           5, 
+/* 5 - Ready to Fire */		     6,
+/* 6 - Waiting to Fire */    	-1,
+/* 7 - Fire */			           8,
+/* 8 - Fired */			           1,
 };
 
 
@@ -130,7 +133,7 @@ int StateMachineClass::defaultStateTimeOutFunction(int input){
 	} else if (		TransitionStartMicros + StateLeadinTimes[currentState] + StateMinTimes[currentState] < currentTime ){
 		return 1; // past min
 	} else {
-		return -1;// in tranision do not change
+		return -1;// in transion, do not change
 	}
 }
 
@@ -139,32 +142,30 @@ const IntFunctionWithOneParameter ContinueState [numberofStates] = {
 /* 0 -- Safe State */	&StateMachineClass::defaultStateTimeOutFunction,
 /* 1 -- Retract P */	&StateMachineClass::defaultStateTimeOutFunction,
 /* 2 -- Retract E */	&StateMachineClass::defaultStateTimeOutFunction,
-/* 3 -- RestFull */	&StateMachineClass::defaultStateTimeOutFunction,
-/* 4 -- Arming */	&StateMachineClass::defaultStateTimeOutFunction,
-/* 5 -- ready */	&StateMachineClass::defaultStateTimeOutFunction,
-/* 6 -- waiting */	&StateMachineClass::defaultStateTimeOutFunction,
-/* 7 -- Fire */		&StateMachineClass::defaultStateTimeOutFunction,
-/* 8 -- Fired */	&StateMachineClass::defaultStateTimeOutFunction
+/* 3 -- RestFull */	  &StateMachineClass::defaultStateTimeOutFunction,
+/* 4 -- Arming */	    &StateMachineClass::defaultStateTimeOutFunction,
+/* 5 -- ready */	    &StateMachineClass::defaultStateTimeOutFunction,
+/* 6 -- waiting */	  &StateMachineClass::defaultStateTimeOutFunction,
+/* 7 -- Fire */		    &StateMachineClass::defaultStateTimeOutFunction,
+/* 8 -- Fired */	    &StateMachineClass::defaultStateTimeOutFunction,
 };
 
 
 
 /*
 StateMachineClass::StateMachineClass( usb_serial_class &print ) { 
-      printer = &print; //operate on the adress of print
-
+      printer = &print; //operate on the address of print
       
 }  
 */
 
 StateMachineClass::StateMachineClass( usb_serial_class &print,HardwareSerial &print2 ) { 
-      printer = &print; //operate on the adress of print
+      printer = &print; //operate on the address of print
 printerHW = &print2;
       
 }
 
 void StateMachineClass::EnableStateMachine( ) { 
-  
   
   	
 	for ( int valveII;valveII< numberOfValues;valveII++){
@@ -203,9 +204,8 @@ void StateMachineClass::debugFunction(void ){
 		printer->print("=");
 		printer->print(ValueState[currentState][valveII]);
 		printer->print(">");
-		
-	} 
 
+	} 
 
 	printer->println("</ TelemPacket>");
 }
@@ -271,9 +271,7 @@ void StateMachineClass::debugFunction(void ){
 		
 		} 
 
-
 		printerHW->println("</ TelemPacket>");
-	
 	
 	
 	//}
@@ -308,7 +306,6 @@ void StateMachineClass::debugFunction(HardwareSerial MySerial ){
 		
 	} 
 
-
 	MySerial.println("</ TelemPacket>");
 }
 
@@ -326,24 +323,20 @@ float readPressureSensor(int pin){
 }
 void StateMachineClass::tickFunction(void ){
 	
-	if (TelemiteryMode==1){
-		//printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
-		// telemitry mode, bit like a debug mode, so spit sutuff out a few times a second
+	if (TelemetryMode==1){
+		//printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
+		// Telemetry mode. A bit like a debug mode, so spit stuff out a few times a second.
 		
-		
-		// dont do this on the time critical, ie, 1 and 7
+		// don't do this on the time critical states, ie, 1 and 7
 		if (currentState==0 or currentState==2 or currentState==3 or currentState==4 or currentState==5 or currentState==6 or currentState==8 or currentState==9){
 			int tmpmillis=millis();
 			if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
 			
-				printer->println("StateMachineClass::tickFunction Telemity mode code gose hear");
-				
-				
-				
+				printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
+												
 				Sensor1=readPressureSensor(2);
 				Sensor2=readPressureSensor(3);
-				
-				
+						
 				debugFunction();
 			
 				telemMillis=millis();
@@ -395,7 +388,7 @@ void StateMachineClass::externalRequest( int NewState ) {
 	if (NewState==0){
 		setMachineState ( NewState );
 	}else{
-		// this is worth considering maybe via some kind of merge of updateSwitches
+		// this is worth considering, maybe via some kind of merge of updateSwitches
 	}
 }
 
@@ -416,9 +409,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 		printer->print("StateMachineClass::setMachineState going to ");
 		printer->print(NewState);
 		printer->print(" ");
-		printer->println(StateNames[NewState]);
-		
-		
+		printer->println(StateNames[NewState]);		
 		
 		currentState=NewState;
 		TransitionState=-1;
@@ -430,10 +421,8 @@ void StateMachineClass::setMachineState( int NewState ) {
 
 
 
-
 void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5){
 	//printer->println("StateMachineClass");
-	
 	
 	
 	if (switch1==0){
@@ -455,9 +444,9 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 		if (currentState==0 or currentState==2 ){
 			// go to rest from safe.
 			if (switch2==0 and (switch3==0 or switch3==1) and switch5==0){
-				// switch 4 is which control mode we are in so it dosnet mater.
-				// so dose pot
-				// so dose switch3=0 or 1 but switch3=2 dose somthing so dont let that through
+				// switch 4 is which control mode we are in so it doesn't matter.
+				// so does pot
+				// so does switch3=0 or 1 but switch3=2 does do something so don't let that through
 				printer->println("we can go to state 3 now");
 				setMachineState(3);
 			}else{
@@ -465,14 +454,14 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 					printer->println("not going to rest due to other switches");
 				}else if (currentState==2){
 					if (switch2==2 and (switch3==0 or switch3==1) and switch5==0){
-						//if switch3==1 then the extra time in two is in the min time so we dont get hear until the extended min time has been used.
+						//if switch3==1 then the extra time in two is in the min time so we don't get here until the extended min time has been used.
 						setMachineState(4);
 					
 					}
 				}
 			}
 		}else if (currentState==4 or currentState==5 or currentState==6 or currentState==8){
-			// if in state 2 or 8 but less than min time then we will be in TransitionState and not get hear
+			// if in state 2 or 8 but less than min time then we will be in TransitionState and not get here
 			if (switch2==0){
 				setMachineState(3);
 			}else if (switch2>0){
@@ -496,21 +485,17 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
 			
 				setMachineState(4);
 			}
-		
-			
-			
+					
 			
 		}else{
 			//setMachineState(0);
-		}
-		
-		
-		
-		
+		}		
+
+    
 	}	
 	if (switch1==2){
-		TelemiteryMode=1;
-		//printer->println("elemiteryMode=1;");
+		TelemetryMode=1;
+		//printer->println("TelemetryMode=1;");
 	}
 
 }
