@@ -4,11 +4,11 @@
 //Value Stuff
 const int numberOfValues=6;
 // ValveAPin = 3;  // chamber fill port (NC)
-// ValveA2Pin = 3; // high flow chamber fill port (NO)
 // ValveBPin = 4;  // main pilot exhaust (NC)
 // ValveCPin = 5;  // buffer fill (NO)
 // ValveDPin = 6;  // buffer exhaust(NC)
 // ValveEPin = 9;  // chamber exhaust(NC)
+// ValveA2Pin = 3; // high flow chamber fill port (NO)
 
 
 /* Doug's pinout*/
@@ -18,18 +18,18 @@ const int ValvePins[numberOfValues] = {
 /*Valve C*/  6,
 /*Valve D*/  7,
 /*Valve E*/  8,
-/*Valve A2*/  9
+/*Valve A2*/ 9,
 };
 
 
 
 const int reversvalue [numberOfValues] = { 
 /*Valve A*/  0,
-/*Valve A2*/ 1,
 /*Valve B*/  0,
 /*Valve C*/  1,
 /*Valve D*/  0,
 /*Valve E*/  0,
+/*Valve A2*/ 1,
 
 };
 
@@ -79,6 +79,7 @@ const int StateLeadinTimes[numberofStates] = {
 /* Fire */			            10000,
 /* Fired */			            10000,
 };
+
 const int StateMinTimes[numberofStates] = { 
 /* Safe State */		        10000, 
 /* Retract/fill Buffer */	 500000, // 0.5 or 1 seconds??
@@ -424,6 +425,12 @@ void StateMachineClass::setMachineState( int NewState ) {
 void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5){
 	//printer->println("StateMachineClass");
 	
+	
+	//switch1 0: safe            1: rest           2:
+	//switch2 0: rest            1: single fire    2: multi fire
+	//switch3 0: short retract   1: long retract   2: retract now
+	//switch4 0: open loopA      1: open loopB     2: closed
+	//switch5 0: rest            1:                2: fire
 	
 	if (switch1==0){
 		setMachineState(0);

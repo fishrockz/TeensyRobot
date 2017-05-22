@@ -137,6 +137,7 @@ void loop() {
 		
 		if (DebugLevel>10){Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.print(switch4);Serial.print(" ");Serial.println(switch5);}
 		
+		// the switch values are described in the StateMachineClass::updateSwitches code
 		theWeapon.updateSwitches(switch1,switch2,switch3,switch4,switch5);
 		
 		
@@ -144,3 +145,6 @@ void loop() {
 	}	
   	
 }
+
+
+
