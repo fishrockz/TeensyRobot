@@ -6,13 +6,17 @@
 
 
 const int DebugLevel=00;
-
+#ifdef WillsBoard
+const uint32_t PPMPin = 9;         //only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
+#else
 const uint32_t PPMPin = 10;         //only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
+#endif
 const uint32_t boardLEDPin = 13;
 //const uint32_t FETLEDPin = 9;
 
 unsigned int flashingTimer1=0;
 unsigned int flashingTimer2=0;
+unsigned int timeoutTimer=0;
 
 StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
@@ -93,6 +97,8 @@ void loop() {
 	theWeapon.tickFunction();
 	
 	int tmptime=millis();
+	
+	
 	if (flashingTimer1+2000 < tmptime){
 		if (flashstate1 == 1){
 			flashstate1=0;
@@ -118,7 +124,9 @@ void loop() {
 	int num = RadioIn.available();
 	//if (DebugLevel>20){Serial.print("radio avail");Serial.println(num);}
 	if (num == 8) {
-
+		
+		timeoutTimer=millis();
+		
 		valRadio1 = RadioIn.read(5);
 		valRadio2 = RadioIn.read(6);
 		valRadio3 = RadioIn.read(7);
@@ -137,12 +145,26 @@ void loop() {
 		
 		if (DebugLevel>10){Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.print(switch4);Serial.print(" ");Serial.println(switch5);}
 		
+		//should we have something to only let the data through if we have two the same in a small time frame?
+		// this would add loads of delay in to firing etc tho..
 		// the switch values are described in the StateMachineClass::updateSwitches code
 		theWeapon.updateSwitches(switch1,switch2,switch3,switch4,switch5);
 		
 		
 		if (DebugLevel>10){Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);}
-	}	
+	}
+	
+	
+	if (timeoutTimer+2000 < tmptime){
+		theWeapon.externalRequest(0);
+		Serial.println("PPM signal not recived for too long so going to safe!!");
+		#ifdef WillsBoard
+			Serial.println("Wills Board check PPM pin");
+		#endif
+	
+	}
+	
+	
   	
 }
 

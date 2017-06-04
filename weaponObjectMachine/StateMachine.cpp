@@ -10,18 +10,30 @@ const int numberOfValues=6;
 // ValveEPin = 9;  // chamber exhaust(NC)
 // ValveA2Pin = 3; // high flow chamber fill port (NO)
 
-
-/* Doug's pinout*/
-const int ValvePins[numberOfValues] = {
-/*Valve A*/  4,
-/*Valve B*/  5,
-/*Valve C*/  6,
-/*Valve D*/  7,
-/*Valve E*/  8,
-/*Valve A2*/ 9,
-};
-
-
+#ifdef WillsBoard
+	/* wills pin out */
+	/* set line 17 in arduino-1.8.2/hardware/teensy/avr/platform.txt to recipe.cpp.o.pattern="{compiler.path}{build.toolchain}{build.command.g++}" -c {build.flags.optimize} {build.flags.common} {build.flags.dep} {build.flags.cpp} {build.flags.cpu} {build.flags.defs} -DARDUINO={runtime.ide.version} -DF_CPU={build.fcpu} -D{build.usbtype} -DLAYOUT_{build.keylayout} -DWillsBoard {includes} "{source_file}" -o "{object_file} "*/
+	const int ValvePins[numberOfValues] = {
+	/*Valve A*/  23,
+	/*Valve B*/  22,
+	/*Valve C*/  21,
+	/*Valve D*/  5,
+	/*Valve E*/  6,
+	/*Valve A2*/  37
+	// /*Aux1 */    36
+	// /*Aux1 */    38
+	};
+#else 
+	/* Doug's pinout*/
+	const int ValvePins[numberOfValues] = {
+	/*Valve A*/  4,
+	/*Valve B*/  5,
+	/*Valve C*/  6,
+	/*Valve D*/  7,
+	/*Valve E*/  8,
+	/*Valve A2*/ 9,
+	};
+#endif
 
 const int reversvalue [numberOfValues] = { 
 /*Valve A*/  0,
