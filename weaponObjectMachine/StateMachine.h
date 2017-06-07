@@ -17,7 +17,8 @@ public:
   //StateMachineClass(  );
   
 void tickFunction();
-void  debugFunction();
+void debugFunction();
+void QuickdebugFunction();
 void debugFunction(HardwareSerial MySerial );
 void EnableStateMachine();
 void externalRequest(int NewState);

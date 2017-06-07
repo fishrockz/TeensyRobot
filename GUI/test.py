@@ -9,7 +9,15 @@ from PyQt4 import QtCore
 import serial,time
 
 	
-
+stateNames=[' Safe ',
+' Retract/fill Buffer '   , 
+' Retract wait '  , 
+' Rest '	          , 
+' Arming '			          , 
+' Ready to Fire '		      ,
+' Waiting to Fire '	  	  ,
+' Fire '			            ,
+' Fired '	]
 
 
 
@@ -18,30 +26,50 @@ class myOutputText(QtGui.QWidget):
 		super(myOutputText, self).__init__(parent)
 		
 		MainLayout = QtGui.QVBoxLayout()
-		logOutput = QtGui.QTextEdit(parent)
-		logOutput.setReadOnly(True)
-		logOutput.setLineWrapMode(QtGui.QTextEdit.NoWrap)
+		self.logOutput = QtGui.QTextEdit(parent)
+		self.logOutput.setReadOnly(True)
+		self.logOutput.setLineWrapMode(QtGui.QTextEdit.NoWrap)
 
-		font = logOutput.font()
-		font.setFamily("Courier")
-		font.setPointSize(10)
+		self.font = self.logOutput.font()
+		self.font.setFamily("Courier")
+		self.font.setPointSize(7)
 
-		MainLayout.addWidget(logOutput)
+		MainLayout.addWidget(self.logOutput)
 		
 		self.setLayout(MainLayout)
+		self.lastState=''
+	def addStuff(self,text):
+		text=QtCore.QString(str(text)+'\n')
 		
-	def addStuff(self,toAdd):
-		logOutput.moveCursor(QTextCursor.End)
-		logOutput.setCurrentFont(font)
-		logOutput.setTextColor(color)
+		if self.lastState!=text:
+			self.logOutput.moveCursor(QtGui.QTextCursor.End)
+			self.logOutput.setCurrentFont(self.font)
+			#self.logOutput.setTextColor(color)
 
-		logOutput.insertPlainText(text)
 
-		sb = logOutput.verticalScrollBar()
-		sb.setValue(sb.maximum())
+		
+			self.logOutput.insertPlainText(text)
+			self.lastState=text
+			sb = self.logOutput.verticalScrollBar()
+			sb.setValue(sb.maximum())
 	def SerialRecive(self,info):
-		pass
-		#print 'SerialRecive'
+		info=str(info[1])
+		#self.pixItemB.setPixmap(self.pixmapB)
+		striped=''
+		state=None
+		#try:
+		if '<TelemPacket>' in info:
+			
+			striped='>'+info.split('<TelemPacket>')[-1].split('</ TelemPacket>')[0]+'<'
+			items=striped.split('><')[1:-1]
+			items=map(lambda x: x.split('='), items)
+			print 'items',items
+			for item in items:
+				#valveinfo=item[0].split('-')
+				if item[0]=='State':
+					#print int(valveinfo[1]),item[1]
+					#self.valves[int(valveinfo[1])]['Gui'].setPixmap(self.ValvePixmaps[int(item[1])])
+					self.addStuff(stateNames[int(item[1])])
 		
 class mysillyPics(QtGui.QWidget):
 	def __init__(self,parent=None):

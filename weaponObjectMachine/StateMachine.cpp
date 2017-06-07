@@ -223,6 +223,11 @@ void StateMachineClass::debugFunction(void ){
 	printer->println("</ TelemPacket>");
 }
 */
+void StateMachineClass::QuickdebugFunction(void ){
+	printerHW->print("<TelemPacket><State=");
+	printerHW->print(currentState);
+	printerHW->println("></ TelemPacket>");
+	}
 void StateMachineClass::debugFunction(void ){
 
 	//if (debugHW==1){
@@ -419,10 +424,11 @@ void StateMachineClass::setMachineState( int NewState ) {
 	}
 	
 	if (NewState!=currentState){
-		printer->print("StateMachineClass::setMachineState going to ");
+		/*printer->print("StateMachineClass::setMachineState going to ");
 		printer->print(NewState);
 		printer->print(" ");
-		printer->println(StateNames[NewState]);		
+		printer->println(StateNames[NewState]);	*/
+		QuickdebugFunction();	
 		
 		currentState=NewState;
 		TransitionState=-1;
