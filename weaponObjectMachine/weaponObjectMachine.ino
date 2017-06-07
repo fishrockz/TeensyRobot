@@ -5,7 +5,7 @@
 #include "weaponObjectMachine.h" 
 
 
-const int DebugLevel=00;
+const int DebugLevel=0;
 #ifdef WillsBoard
 const uint32_t PPMPin = 9;         //only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
 #else
