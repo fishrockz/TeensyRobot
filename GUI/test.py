@@ -1,4 +1,4 @@
-import sys
+import sys,select
 
 from PyQt4.QtCore import QTimer
 from PyQt4.QtGui import QApplication
@@ -6,9 +6,11 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 
-import serial
+import serial,time
 
 	
+
+
 
 
 class myOutputText(QtGui.QWidget):
@@ -167,7 +169,7 @@ class mysillyPics(QtGui.QWidget):
 		self.valves.append({'Gui':pixItem})
 	def SerialRecive(self,info):
 		print 'SerialRecive:',info
-		info=str(info)
+		info=str(info[1])
 		#self.pixItemB.setPixmap(self.pixmapB)
 		striped=''
 		state=None
@@ -211,66 +213,106 @@ class mysillyPics(QtGui.QWidget):
 		self.view.updateScene([self.view.sceneRect(),])
 		self.view.update()
 		
-		
+class CommsThread(QtCore.QThread):
+
+	SerialThreadEvent = QtCore.pyqtSignal(object)
+
+	def __init__(self, FileObject):
+		QtCore.QThread.__init__(self)
+		self.serialSream=''
+		self._FileObject=FileObject
+	def run(self):
+	
+	
+		while 1:
+			newline=''
+			if self._FileObject !=None:
+				#try:
+					print "select"
+					#myselect=os.select()
+					myselect=select.select([self._FileObject,],[],[])
+					#print 'select:',myselect
+					new = self._FileObject.read()
+					while new != '':
+						newline+=new
+						new = self._FileObject.read()
+					print 'new: ',new,'"'+str(new)+'"',type(new)
+				
+				#except:
+				#	pass
+			else:
+				pass
+				#end thread?
+			self.serialSream+=newline
+			
+			
+			
+			if ('</ TelemPacket>'in self.serialSream):
+				
+				splitA=self.serialSream.split('</ TelemPacket>')
+				newistPacket=splitA[-2]
+				if '<TelemPacket>' in newistPacket:
+					fullpacket='<TelemPacket>'+newistPacket.split('<TelemPacket>')[-1]+'</ TelemPacket>'
+					print 'Packet'
+					self.SerialThreadEvent.emit(('Packet',fullpacket))
+					
+				self.serialSream=splitA[-1]
+
+	
+	
+	
+
 class ConnectStuff(QtGui.QWidget):
-	SerialDataOut = QtCore.pyqtSignal([str] )
+	SerialDataOut = QtCore.pyqtSignal(object )
 	def __init__(self,parent=None):
 		super(ConnectStuff, self).__init__(parent)
 		layout = QtGui.QVBoxLayout()
-		self.b1 = QtGui.QPushButton("ACM")
+		self.b1 = QtGui.QPushButton("Teensy via USB")
 		self.b1.clicked.connect(self.setoffACM)
-		self.b2 = QtGui.QPushButton("USB")
+		self.b2 = QtGui.QPushButton("Radio")
 		self.b2.clicked.connect(self.setoffUSB)
 		#self.b1.clicked.connect(self.btnstate)
 		layout.addWidget(self.b1)
 		layout.addWidget(self.b2)
-		self.timer = QTimer()
+		#self.timer = QTimer()
 		self.setLayout(layout)
 		self.console=None
 #		try:
 ##			self.SerialConnn
 		self.serialSream=''
 		self.serial = None
-		self.timer.timeout.connect(self.tick)
-		self.timer.start(1000)
+		#self.timer.timeout.connect(self.tick)
+		#self.timer.start(100)
 		
 		
 	def setoffACM(self):
-		print "hi there"
+		print "hi there AMC"
 		try:
 			self.serial = serial.Serial('/dev/ttyACM0')
-			#self.serial = serial.Serial('/dev/ttyUSB0')
 			self.serial.timeout = 0.001
+			
+			self.MyCommThread = CommsThread(self.serial)
+            		self.MyCommThread.SerialThreadEvent.connect(self.tick)
+            		self.MyCommThread.start()
 		except:
 			pass
 	def setoffUSB(self):
-		print "hi there"
+		print "hi there USB"
 		try:
-			#self.serial = serial.Serial('/dev/ttyACM0')
 			self.serial = serial.Serial('/dev/ttyUSB0',baudrate=57600)
 			self.serial.timeout = 0.001
+			
+			self.MyCommThread = CommsThread(self.serial)
+            		self.MyCommThread.SerialThreadEvent.connect(self.tick)
+            		self.MyCommThread.start()
 		except:
 			pass		
 		
-	def tick(self):
-		#print 'tick',self.serial
-		newline=''
-		if self.serial !=None:
-			try:
-				new = self.serial.read()
-				while new != '':
-					newline+=new
-					new = self.serial.read()
-				print 'new: ',new
-				
-			except:
-				pass
-		self.serialSream+=newline
-		if (	'<TelemPacket>'in self.serialSream) and('</ TelemPacket>'in self.serialSream):
-		
-		
-			self.SerialDataOut.emit(self.serialSream)
-			self.serialSream=''
+	def tick(self,myinfo):
+		print 'tick',myinfo
+		#if myinfo[0]=='Packet':
+		self.SerialDataOut.emit(myinfo)
+
 		#print 'newline :',newline
 
 
