@@ -187,7 +187,7 @@ StateMachineClass::StateMachineClass(usb_serial_class &print, HardwareSerial &pr
 }
 
 void StateMachineClass::EnableStateMachine( ) {
-    for (int valveII; valveII < N_VALVES; valveII++) {
+    for (int valveII = 0; valveII < N_VALVES; valveII++) {
         //digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
         pinMode(ValvePins[valveII],OUTPUT);
     }
@@ -196,7 +196,7 @@ void StateMachineClass::EnableStateMachine( ) {
 //    }
 }
 
-/*
+#if 0
 void StateMachineClass::debugFunction(void ){
 
     printer->print("StateMachineClass::debugFunction");
@@ -217,7 +217,7 @@ void StateMachineClass::debugFunction(void ){
     printer->print(Sensor2);
     printer->print(">");
 
-    for ( int valveII;valveII< N_VALVES;valveII++){
+    for ( int valveII = 0;valveII< N_VALVES;valveII++){
         printer->print("<ValveII-");
         printer->print(valveII);
         printer->print("=");
@@ -228,7 +228,8 @@ void StateMachineClass::debugFunction(void ){
 
     printer->println("</ TelemPacket>");
 }
-*/
+#endif
+
 void StateMachineClass::QuickdebugFunction(void) {
     printerHW->print("<TelemPacket><State=");
     printerHW->print(currentState);
@@ -256,7 +257,7 @@ void StateMachineClass::debugFunction(void) {
         printerHW->print(Sensor2);
         printerHW->print(">");
 
-        for ( int valveII;valveII< N_VALVES;valveII++){
+        for (int valveII=0; valveII<N_VALVES; valveII++) {
             printerHW->print("<ValveII-");
             printerHW->print(valveII);
             printerHW->print("=");
@@ -287,7 +288,7 @@ void StateMachineClass::debugFunction(void) {
         printer->print(Sensor2);
         printer->print(">");
 
-        for ( int valveII;valveII< N_VALVES;valveII++){
+        for (int valveII=0; valveII<N_VALVES; valveII++) {
             printer->print("<ValveII-");
             printer->print(valveII);
             printer->print("=");
@@ -322,7 +323,7 @@ void StateMachineClass::debugFunction(HardwareSerial MySerial ){
     MySerial.print(Sensor2);
     MySerial.print(">");
 
-    for ( int valveII;valveII< N_VALVES;valveII++){
+    for (int valveII=0; valveII<N_VALVES; valveII++){
         MySerial.print("<ValveII-");
         MySerial.print(valveII);
         MySerial.print("=");
@@ -354,7 +355,7 @@ void StateMachineClass::tickFunction(void ){
 
         // don't do this on the time critical states, ie, 1 and 7
         if (currentState==0 or currentState==2 or currentState==3 or currentState==4 or currentState==5 or currentState==6 or currentState==8 or currentState==9){
-            int tmpmillis=millis();
+            unsigned tmpmillis=millis();
             if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
 
                 printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
@@ -420,7 +421,7 @@ void StateMachineClass::externalRequest( int NewState ) {
 void StateMachineClass::setMachineState( int NewState ) {
     int PinVal;
 
-    for (int valveII; valveII < N_VALVES; valveII++) {
+    for (int valveII=0; valveII<N_VALVES; valveII++) {
         //digitalWrite(valveII,ValueState[NewState][valveII]);
         PinVal=ValueState[NewState][valveII];
         if (reversvalue[valveII]==1) {

@@ -1,5 +1,8 @@
 //Teensy libaries
 #include <PulsePosition.h>
+#include <SparkFunLSM9DS1.h>
+#include <FlexCAN.h>
+
 
 //Custom Robot Libaries
 #include "weaponObjectMachine.h"
@@ -14,9 +17,9 @@ static const uint32_t PPMPin = 10;         //only certain pins work, eg, 9 and 1
 static const uint32_t boardLEDPin = 13;
 //const uint32_t FETLEDPin = 9;
 
-unsigned int flashingTimer1=0;
-unsigned int flashingTimer2=0;
-unsigned int timeoutTimer=0;
+uint32_t flashingTimer1=0;
+uint32_t flashingTimer2=0;
+uint32_t timeoutTimer=0;
 
 StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
@@ -77,8 +80,8 @@ void twoSwitchesFromChan(int channel, int &switchA, int &switchB) {
 }
 
 
-unsigned int flashstate1=0;
-unsigned int flashstate2=0;
+uint32_t flashstate1=0;
+uint32_t flashstate2=0;
 
 
 void loop() {
@@ -87,7 +90,7 @@ void loop() {
 
     theWeapon.tickFunction();
 
-    int tmptime=millis();
+    uint32_t tmptime=millis();
 
 
     if (flashingTimer1+2000 < tmptime) {
