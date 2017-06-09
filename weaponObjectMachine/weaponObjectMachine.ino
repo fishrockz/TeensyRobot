@@ -2,6 +2,7 @@
 #include <PulsePosition.h>
 #include <SparkFunLSM9DS1.h>
 #include <FlexCAN.h>
+#include <IntervalTimer.h>
 
 
 //Custom Robot Libaries
@@ -24,20 +25,24 @@ uint32_t timeoutTimer=0;
 StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
 
-void setup() {
+IntervalTimer WeaponTick;
 
+void weapon_tick(void);
+
+void setup() {
     RadioIn.begin(PPMPin);
     //Serial1.begin(115200);
     Serial1.begin(57600);
     //Serial1.begin(9600);
+    
 
     theWeapon.EnableStateMachine();
     theWeapon.externalRequest(0);
 
     pinMode(boardLEDPin,OUTPUT);
+    WeaponTick.begin(weapon_tick, 1000);
     //pinMode(FETLEDPin,OUTPUT);
     //PinMode(ValvePins[valveII],OUTPUT);
-
 }
 
 
@@ -83,11 +88,7 @@ void twoSwitchesFromChan(int channel, int &switchA, int &switchB) {
 uint32_t flashstate1=0;
 uint32_t flashstate2=0;
 
-
-void loop() {
-
-    //theWeapon.foo();
-
+void weapon_tick() {
     theWeapon.tickFunction();
 
     uint32_t tmptime=millis();
@@ -163,6 +164,10 @@ void loop() {
             Serial.println("Wills Board check PPM pin");
         #endif
     }
+}
+
+void loop() {
+
 }
 
 

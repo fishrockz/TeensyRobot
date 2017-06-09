@@ -1,3 +1,5 @@
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
 
 #include "Arduino.h"
 #include <usb_serial.h>
@@ -36,3 +38,5 @@ class StateMachineClass
     uint32_t telemMillis=0;
     uint32_t telemMillisRefreshRate=1000;
 };
+
+#endif
