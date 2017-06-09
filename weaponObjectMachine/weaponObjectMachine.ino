@@ -7,6 +7,7 @@
 
 //Custom Robot Libaries
 #include "weaponObjectMachine.h"
+#include "SerialPrint.h"
 
 
 static const int DebugLevel=0;
@@ -22,7 +23,7 @@ uint32_t flashingTimer1=0;
 uint32_t flashingTimer2=0;
 uint32_t timeoutTimer=0;
 
-StateMachineClass theWeapon(Serial,Serial1);
+StateMachineClass theWeapon;
 PulsePositionInput RadioIn;
 
 IntervalTimer WeaponTick;
@@ -152,16 +153,16 @@ void weapon_tick() {
 
 
         if (DebugLevel>10){
-            Serial.print(pot1);Serial.print(" ");Serial.print(switch1);Serial.print(" ");Serial.print(switch2);Serial.print(" ");Serial.print(switch3);Serial.print(" ");Serial.println(switch4);
+            debug_println_rl(100, "%d %d %d %d %d", pot1, switch1, switch2, switch3, switch4);
         }
     }
 
 
     if (timeoutTimer+2000 < tmptime){
         theWeapon.externalRequest(0);
-        Serial.println("PPM signal not recived for too long so going to safe!!");
+        debug_println_rl(1000, "PPM signal not recived for too long so going to safe!!");
         #ifdef WillsBoard
-            Serial.println("Wills Board check PPM pin");
+            debug_println_rl(1000, "Wills Board check PPM pin");
         #endif
     }
 }

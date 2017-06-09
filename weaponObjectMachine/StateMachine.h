@@ -14,18 +14,17 @@ class StateMachineClass
     float Sensor2;
     void updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5); 
     int defaultStateTimeOutFunction(int input);
-    StateMachineClass( usb_serial_class &print,HardwareSerial &print2 );
+    StateMachineClass();
 
     void tickFunction();
     void debugFunction();
     void QuickdebugFunction();
-    void debugFunction(HardwareSerial MySerial );
     void EnableStateMachine();
     void externalRequest(int NewState);
 
     private:
-    usb_serial_class* printer;  
-    HardwareSerial* printerHW; 
+    // usb_serial_class* printer;  
+    // HardwareSerial* printerHW; 
 
     int happyMachine=-1;
     int DebugLevel=22;

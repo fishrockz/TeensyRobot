@@ -1,6 +1,8 @@
 #include "StateMachine.h"
 
-//Value Stuff
+#include "SerialPrint.h"
+
+//Valve Stuff
 static const int N_VALVES=6;
 
 // ValveAPin = 3;  // chamber fill port (NC)
@@ -48,7 +50,7 @@ const int reversvalue [N_VALVES] = {
 //state stuff
 const int numberofStates=9;
 
-const int ValueState[numberofStates][N_VALVES] = {
+const int ValveState[numberofStates][N_VALVES] = {
 /* 0 -- Safe State */
 {0, 0, 0, 1, 1, 0},
 
@@ -88,6 +90,18 @@ const char *StateNames[numberofStates] = {
     "Waiting to Fire",
     "Fire",
     "Fired"
+};
+
+enum States {
+    STATE_SAFE = 0,
+    STATE_RETRACT = 1,
+    STATE_EXPAND = 2,
+    STATE_REST = 3,
+    STATE_ARMING = 4,
+    STATE_READY_TO_FIRE = 5,
+    STATE_WAITING_TO_FIRE = 6,
+    STATE_FIRE = 7,
+    STATE_FIRED = 8,
 };
 
 const int StateLeadinTimes[numberofStates] = {
@@ -145,7 +159,7 @@ const int AutoTransitionTo[numberofStates] = {
 //State Machine
 
 int StateMachineClass::defaultStateTimeOutFunction(int input) {
-//printer->println("I'm StateMachineClass::defaultStateTimeOutFunction");
+    debug_println("I'm StateMachineClass::defaultStateTimeOutFunction");
     //StateMinTimes[currentState]+StateLeadinTimes[currentState]
     unsigned long currentTime = micros();
 
@@ -173,22 +187,12 @@ const IntFunctionWithOneParameter ContinueState [numberofStates] = {
 };
 
 
-
-/*
-StateMachineClass::StateMachineClass(usb_serial_class &print) {
-      printer = &print; //operate on the address of print
-
-}
-*/
-
-StateMachineClass::StateMachineClass(usb_serial_class &print, HardwareSerial &print2) {
-    printer = &print; //operate on the address of print
-    printerHW = &print2;
+StateMachineClass::StateMachineClass() {
 }
 
 void StateMachineClass::EnableStateMachine( ) {
     for (int valveII = 0; valveII < N_VALVES; valveII++) {
-        //digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
+        //digitalWrite(ValvePins[valveII],ValveState[NewState][valveII]);
         pinMode(ValvePins[valveII],OUTPUT);
     }
 //for( int valveII = 0; valveII < N_VALVES; valveII += 1 ) {
@@ -196,145 +200,25 @@ void StateMachineClass::EnableStateMachine( ) {
 //    }
 }
 
-#if 0
-void StateMachineClass::debugFunction(void ){
-
-    printer->print("StateMachineClass::debugFunction");
-    printer->print("<TelemPacket>");
-    printer->print("<State=");
-    printer->print(currentState);
-    printer->print(">");
-    printer->print("<TransitionState=");
-    printer->print(TransitionState);
-    printer->print(">");
-    printer->print("<happyMachine=");
-    printer->print(happyMachine);
-    printer->print(">");
-    printer->print("<Sensor1=");
-    printer->print(Sensor1);
-    printer->print(">");
-    printer->print("<Sensor2=");
-    printer->print(Sensor2);
-    printer->print(">");
-
-    for ( int valveII = 0;valveII< N_VALVES;valveII++){
-        printer->print("<ValveII-");
-        printer->print(valveII);
-        printer->print("=");
-        printer->print(ValueState[currentState][valveII]);
-        printer->print(">");
-
-    }
-
-    printer->println("</ TelemPacket>");
-}
-#endif
-
 void StateMachineClass::QuickdebugFunction(void) {
-    printerHW->print("<TelemPacket><State=");
-    printerHW->print(currentState);
-    printerHW->println("></ TelemPacket>");
+    telemetry_print("<TelemPacket><State=%d></ TelemPacket>", currentState);
 }
 
 void StateMachineClass::debugFunction(void) {
 
-    //if (debugHW==1){
-        printerHW->print("StateMachineClass::debugFunction");
-        printerHW->print("<TelemPacket>");
-        printerHW->print("<State=");
-        printerHW->print(currentState);
-        printerHW->print(">");
-        printerHW->print("<TransitionState=");
-        printerHW->print(TransitionState);
-        printerHW->print(">");
-        printerHW->print("<happyMachine=");
-        printerHW->print(happyMachine);
-        printerHW->print(">");
-        printerHW->print("<Sensor1=");
-        printerHW->print(Sensor1);
-        printerHW->print(">");
-        printerHW->print("<Sensor2=");
-        printerHW->print(Sensor2);
-        printerHW->print(">");
-
-        for (int valveII=0; valveII<N_VALVES; valveII++) {
-            printerHW->print("<ValveII-");
-            printerHW->print(valveII);
-            printerHW->print("=");
-            printerHW->print(ValueState[currentState][valveII]);
-            printerHW->print(">");
-
-        }
-
-
-        printerHW->println("</ TelemPacket>");
-
-    //}else{
-        printer->print("StateMachineClass::debugFunction");
-        printer->print("<TelemPacket>");
-        printer->print("<State=");
-        printer->print(currentState);
-        printer->print(">");
-        printer->print("<TransitionState=");
-        printer->print(TransitionState);
-        printer->print(">");
-        printer->print("<happyMachine=");
-        printer->print(happyMachine);
-        printer->print(">");
-        printer->print("<Sensor1=");
-        printer->print(Sensor1);
-        printer->print(">");
-        printer->print("<Sensor2=");
-        printer->print(Sensor2);
-        printer->print(">");
-
-        for (int valveII=0; valveII<N_VALVES; valveII++) {
-            printer->print("<ValveII-");
-            printer->print(valveII);
-            printer->print("=");
-            printer->print(ValueState[currentState][valveII]);
-            printer->print(">");
-
-        }
-
-        printerHW->println("</ TelemPacket>");
-
-
-    //}
-}
-
-void StateMachineClass::debugFunction(HardwareSerial MySerial ){
-
-    MySerial.print("StateMachineClass::debugFunction");
-    MySerial.print("<TelemPacket>");
-    MySerial.print("<State=");
-    MySerial.print(currentState);
-    MySerial.print(">");
-    MySerial.print("<TransitionState=");
-    MySerial.print(TransitionState);
-    MySerial.print(">");
-    MySerial.print("<happyMachine=");
-    MySerial.print(happyMachine);
-    MySerial.print(">");
-    MySerial.print("<Sensor1=");
-    MySerial.print(Sensor1);
-    MySerial.print(">");
-    MySerial.print("<Sensor2=");
-    MySerial.print(Sensor2);
-    MySerial.print(">");
-
-    for (int valveII=0; valveII<N_VALVES; valveII++){
-        MySerial.print("<ValveII-");
-        MySerial.print(valveII);
-        MySerial.print("=");
-        MySerial.print(ValueState[currentState][valveII]);
-        MySerial.print(">");
-
+    telemetry_print("StateMachineClass::debugFunction"
+                    "<TelemPacket>"
+                    "<State=%d>"
+                    "<TransitionState=%d>"
+                    "<happyMachine=%d>"
+                    "<Sensor1=%f>"
+                    "<Sensor2=%f>",
+                    currentState, TransitionState, happyMachine, Sensor1, Sensor2);
+    for (int valveII=0; valveII<N_VALVES; valveII++) {
+        telemetry_print("<ValveII-%d=%d>", valveII, ValveState[currentState][valveII]);
     }
-
-    MySerial.println("</ TelemPacket>");
+    telemetry_print("</ TelemPacket>\n");
 }
-
 
 float readPressureSensor(int pin){
 
@@ -358,7 +242,7 @@ void StateMachineClass::tickFunction(void ){
             unsigned tmpmillis=millis();
             if ( (tmpmillis >telemMillisRefreshRate) and ( telemMillis < tmpmillis-telemMillisRefreshRate)){
 
-                printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
+                debug_println("StateMachineClass::tickFunction Telemetry mode code goes here");
 
                 Sensor1=readPressureSensor(2);
                 Sensor2=readPressureSensor(3);
@@ -378,30 +262,23 @@ void StateMachineClass::tickFunction(void ){
         if (tmpContInfo==0)
         {
             //if (TransitionState<1){
-                printer->print("StateMachineClass::tickFunction now at State ");
-                printer->print(currentState);
-                printer->print(" ");
-                printer->println(StateNames[currentState]);
+                debug_println("StateMachineClass::tickFunction now at State %d %s",
+                              currentState, StateNames[currentState]);
             //}
             TransitionState=0;
 
             if (AutoTransitionTo[currentState]>-1){
                 int gotostate=AutoTransitionTo[currentState];
 
-                printer->print("StateMachineClass::tickFunction going to State ");
-                printer->print(gotostate);
-                printer->print(" ");
-                printer->println(StateNames[gotostate]);
+                debug_println("StateMachineClass::tickFunction going to State %d %s",
+                              gotostate, StateNames[gotostate]);
 
                 setMachineState(gotostate);
             }
         }else if (tmpContInfo==1){
             if (TransitionState!=1){
-                printer->print("StateMachineClass::tickFunction passed minimum time in state: ");
-                printer->print(currentState);
-                printer->print(" ");
-                printer->println(StateNames[currentState]);
-
+                debug_println("StateMachineClass::tickFunction passed minimum time in state: %d %s",
+                              currentState, StateNames[currentState]);
             }
 
             TransitionState=1;
@@ -422,8 +299,8 @@ void StateMachineClass::setMachineState( int NewState ) {
     int PinVal;
 
     for (int valveII=0; valveII<N_VALVES; valveII++) {
-        //digitalWrite(valveII,ValueState[NewState][valveII]);
-        PinVal=ValueState[NewState][valveII];
+        //digitalWrite(valveII,ValveState[NewState][valveII]);
+        PinVal=ValveState[NewState][valveII];
         if (reversvalue[valveII]==1) {
             if (PinVal==1) {PinVal=0;}else{PinVal=1;}
         }
@@ -431,10 +308,8 @@ void StateMachineClass::setMachineState( int NewState ) {
     }
 
     if (NewState != currentState) {
-        /*printer->print("StateMachineClass::setMachineState going to ");
-        printer->print(NewState);
-        printer->print(" ");
-        printer->println(StateNames[NewState]);    */
+        // debug_println("StateMachineClass::setMachineState going to %d %s",
+        //               NetState, StateNames[NewState]);
         QuickdebugFunction();
 
         currentState=NewState;
@@ -446,7 +321,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 
 
 void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, int switch4, int switch5) {
-    //printer->println("StateMachineClass");
+    //debug_println("StateMachineClass");
 
 
     //switch1 0: safe            1: rest           2:
@@ -458,30 +333,30 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
     if (switch1==0) {
         setMachineState(0);
         if (happyMachine!=1 and switch1==0 and switch2==0 and (switch3==0 or switch3==1) and switch5==0){
-            printer->println("now I'm happy! :)");
-            setMachineState(0);
+            debug_println("now I'm happy! :)");
+            setMachineState(STATE_SAFE);
             happyMachine=1;
         }
     } else if(TransitionState<0) {
-        //printer->println("mid Transition");
+        //debug_println("mid Transition");
 
     } else if (happyMachine!=1) {
-        printer->println("not happy!");
+        debug_println("not happy!");
     } else if (switch1>0) {
     // normal active mode
     //4568
-        if (currentState==0 or currentState==2) {
+        if (currentState==STATE_SAFE or currentState==STATE_EXPAND) {
             // go to rest from safe.
             if (switch2==0 and (switch3==0 or switch3==1) and switch5==0){
                 // switch 4 is which control mode we are in so it doesn't matter.
                 // so does pot
                 // so does switch3=0 or 1 but switch3=2 does do something so don't let that through
-                printer->println("we can go to state 3 now");
-                setMachineState(3);
+                debug_println("we can go to state 3 (Rest) now");
+                setMachineState(STATE_REST);
             } else {
-                if (currentState==0) {
-                    printer->println("not going to rest due to other switches");
-                } else if (currentState==2) {
+                if (currentState==STATE_SAFE) {
+                    debug_println("not going to rest due to other switches");
+                } else if (currentState==STATE_EXPAND) {
                     if (switch2==2 and (switch3==0 or switch3==1) and switch5==0) {
                         //if switch3==1 then the extra time in two is in the min time so we don't get here until the extended min time has been used.
                         setMachineState(4);
@@ -489,39 +364,37 @@ void StateMachineClass::updateSwitches(int switch1, int switch2, int switch3, in
                     }
                 }
             }
-        } else if (currentState==4 or currentState==5 or currentState==6 or currentState==8) {
-            // if in state 2 or 8 but less than min time then we will be in TransitionState and not get here
+        } else if (currentState==STATE_ARMING or currentState==STATE_READY_TO_FIRE or currentState==STATE_WAITING_TO_FIRE or currentState==STATE_FIRED) {
+            // if in state 2 (expand) or 8(fired) but less than min time then we will be in TransitionState and not get here
             if (switch2==0) {
-                setMachineState(3);
+                setMachineState(STATE_REST);
             } else if (switch2>0) {
 
-                if (currentState==5 or currentState==6){
+                if (currentState==STATE_READY_TO_FIRE or currentState==STATE_WAITING_TO_FIRE) {
                     if (switch5==2){
-                        setMachineState(7);
+                        setMachineState(STATE_FIRE);
                     }
-
-
                 }
             }
-        }else if (currentState==3 and TransitionState>-1){
+        } else if (currentState==STATE_REST and TransitionState>-1) {
         // at rest
-            if (switch3==2 and switch2==0 ){
+            if (switch3==2 and switch2==0 ) {
                 // active retract from rest
 
-                setMachineState(1);
-            }else if ( switch3 < 2 and switch5==0 and switch2==1){
+                setMachineState(STATE_RETRACT);
+            } else if ( switch3 < 2 and switch5==0 and switch2==1) {
 
-                setMachineState(4);
+                setMachineState(STATE_ARMING);
             }
 
 
-        }else{
-            //setMachineState(0);
+        } else {
+            //setMachineState(STATE_SAFE);
         }
     }
     if (switch1==2){
         TelemetryMode=1;
-        //printer->println("TelemetryMode=1;");
+        //debug_println("TelemetryMode=1;");
     }
 
 }
