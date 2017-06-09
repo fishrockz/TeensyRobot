@@ -109,8 +109,8 @@ const int StateAutoTransitionTimes[numberofStates] = {
 /* Retract/fill Buffer */ 	10000, 
 /* Retract wait */	       	10000, 
 /* Rest */			            10000, 
-/* Arming */			        3000000, // 5 seconds
-/* Ready to Fire */		      10000, // 7 seconds
+/* Arming */			        5000000, // 5 seconds
+/* Ready to Fire */		      5000000, // 7 seconds
 /* Waiting to Fire */		    10000,
 /* Fire */			            10000,
 /* Fired */			            10000,
