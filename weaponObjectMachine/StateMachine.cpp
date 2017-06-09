@@ -94,8 +94,8 @@ const int StateLeadinTimes[numberofStates] = {
 
 const int StateMinTimes[numberofStates] = { 
 /* Safe State */		        10000, 
-/* Retract/fill Buffer */	 500000, // 0.5 or 1 seconds??
-/* Retract wait */	    	3000000, // 4 seconds of expansion
+/* Retract/fill Buffer */	 700000, // 0.5 or 1 seconds??
+/* Retract wait */	    	5000000, // 4 seconds of expansion
 /* Rest */			            10000, 
 /* Arming */			          10000, 
 /* Ready to Fire */		      10000,
@@ -109,8 +109,8 @@ const int StateAutoTransitionTimes[numberofStates] = {
 /* Retract/fill Buffer */ 	10000, 
 /* Retract wait */	       	10000, 
 /* Rest */			            10000, 
-/* Arming */			        5000000, // 5 seconds
-/* Ready to Fire */		      5000000, // 7 seconds
+/* Arming */			        3000000, // 5 seconds
+/* Ready to Fire */		      200000, // 7 seconds
 /* Waiting to Fire */		    10000,
 /* Fire */			            10000,
 /* Fired */			            10000,
@@ -352,8 +352,8 @@ void StateMachineClass::tickFunction(void ){
 			
 				printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
 												
-				Sensor1=readPressureSensor(2);
-				Sensor2=readPressureSensor(3);
+				Sensor1=readPressureSensor(3);
+				Sensor2=readPressureSensor(2);
 						
 				debugFunction();
 			
