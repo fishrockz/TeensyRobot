@@ -205,6 +205,10 @@ class mysillyPics(QtGui.QWidget):
 		if '<TelemPacket>' in info:
 			
 			striped='>'+info.split('<TelemPacket>')[-1].split('</ TelemPacket>')[0]+'<'
+			
+			striped='<'+'><'.join(map(lambda bit: bit.split('<')[-1], striped.split('>')[:-1]))+'>'
+			## this is needed after I added more line endings to the telemitry'
+			
 			items=striped.split('><')[1:-1]
 			items=map(lambda x: x.split('='), items)
 			print 'items',items
