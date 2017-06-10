@@ -8,6 +8,7 @@
 //Custom Robot Libaries
 #include "weaponObjectMachine.h"
 #include "SerialPrint.h"
+#include "GyroSteer.h"
 
 
 static const int DebugLevel=0;
@@ -42,6 +43,8 @@ void setup() {
 
     pinMode(boardLEDPin,OUTPUT);
     WeaponTick.begin(weapon_tick, 1000);
+    WeaponTick.priority(128);
+    gyrosteer_begin();
     //pinMode(FETLEDPin,OUTPUT);
     //PinMode(ValvePins[valveII],OUTPUT);
 }

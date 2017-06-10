@@ -70,8 +70,7 @@ static bool check_for_rl(uint32_t gap, const char *format) {
 }
 
 void debug_print_rl(uint32_t gap, const char *format, ...) {
-    if (check_for_rl(gap, format))
-    {
+    if (check_for_rl(gap, format)) {
         va_list args;
         va_start(args, format);
         vsnprintf(PRINT_BUFFER, MAX_PRINT_LINE, format, args);
@@ -81,8 +80,7 @@ void debug_print_rl(uint32_t gap, const char *format, ...) {
 }
 
 void debug_println_rl(uint32_t gap, const char *format, ...) {
-    if (check_for_rl(gap, format))
-    {
+    if (check_for_rl(gap, format)) {
         va_list args;
         va_start(args, format);
         vsnprintf(PRINT_BUFFER, MAX_PRINT_LINE, format, args);
