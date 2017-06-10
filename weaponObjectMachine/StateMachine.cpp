@@ -236,25 +236,33 @@ void StateMachineClass::debugFunction(void ){
 		printerHW->print("<State=");
 		printerHW->print(currentState);
 		printerHW->print(">");
-		printerHW->print("<TransitionState=");
-		printerHW->print(TransitionState);
-		printerHW->print(">");
-		printerHW->print("<happyMachine=");
-		printerHW->print(happyMachine);
-		printerHW->print(">");
+		printerHW->println("</ TelemPacket>");
+		
+		
+		
+//		printerHW->print("<TransitionState=");
+//		printerHW->print(TransitionState);
+//		printerHW->print(">");
+//		printerHW->print("<happyMachine=");
+//		printerHW->print(happyMachine);
+//		printerHW->print(">");
+
+		printerHW->print("<TelemPacket>");
 		printerHW->print("<Sensor1=");
 		printerHW->print(Sensor1);
-		printerHW->print(">");
+		printerHW->println(">");
 		printerHW->print("<Sensor2=");
 		printerHW->print(Sensor2);
-		printerHW->print(">");
-
+		printerHW->println(">");
+		printerHW->println("</ TelemPacket>");
+		
+		printerHW->print("<TelemPacket>");
 		for ( int valveII;valveII< numberOfValues;valveII++){
 			printerHW->print("<ValveII-");
 			printerHW->print(valveII);
 			printerHW->print("=");
 			printerHW->print(ValueState[currentState][valveII]);
-			printerHW->print(">");
+			printerHW->println(">");
 		
 		} 
 
