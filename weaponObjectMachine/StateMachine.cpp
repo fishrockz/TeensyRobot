@@ -1,5 +1,6 @@
 #include "StateMachine.h"
 
+#include <Servo.h> 
 
 //Value Stuff
 const int numberOfValues=6;
@@ -44,6 +45,28 @@ const int reversvalue [numberOfValues] = {
 /*Valve A2*/ 1,
 
 };
+
+
+const int servopin[numberOfValues] = { 
+/*Valve A*/  1,
+/*Valve B*/  1,
+/*Valve C*/  0,
+/*Valve D*/  0,
+/*Valve E*/  0,
+/*Valve A2*/ 0,
+
+};
+
+Servo servoA;
+Servo servoB;
+
+Servo servoObj[numberOfValues]={
+servoA,
+	servoB,
+
+};
+
+
 
 //state stuff
 const int numberofStates=9;
@@ -183,7 +206,11 @@ void StateMachineClass::EnableStateMachine( ) {
   	
 	for ( int valveII;valveII< numberOfValues;valveII++){
 		//digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
-		pinMode(ValvePins[valveII],OUTPUT);
+		if (servopin[valveII] == 0 ){
+			pinMode(ValvePins[valveII],OUTPUT);
+	 	}else{
+			servoObj[valveII].attach(ValvePins[valveII]);
+	 	}
 	}
 //for( int valveII = 0; valveII < numberOfValues; valveII += 1 ) {
 //		);
@@ -428,7 +455,11 @@ void StateMachineClass::setMachineState( int NewState ) {
 		if (reversvalue[valveII]==1){
 			if (PinVal==1) {PinVal=0;}else{PinVal=1;}
 		}
-		digitalWrite(ValvePins[valveII],PinVal);
+		if (servopin[valveII] == 0 ){
+			digitalWrite(ValvePins[valveII],PinVal);
+		}else{
+			servoObj[valveII].write(100*PinVal);
+		}
 	}
 	
 	if (NewState!=currentState){
