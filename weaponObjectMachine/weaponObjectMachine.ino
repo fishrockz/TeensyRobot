@@ -5,6 +5,15 @@
 #include "weaponObjectMachine.h" 
 
 
+extern char* __brkval;
+
+unsigned int freeRam() {
+    char tos;
+
+    return &tos - __brkval;
+}
+
+
 const int DebugLevel=0;
 #ifdef WillsBoard
 const uint32_t PPMPin = 9;         //only certain pins work, eg, 9 and 10 on teensy 3.1 and teensy 3.5
@@ -22,7 +31,7 @@ StateMachineClass theWeapon(Serial,Serial1);
 PulsePositionInput RadioIn;
 
 void setup() {
-
+  Serial.print("freeRam: "); Serial.println(freeRam());
 	RadioIn.begin(PPMPin);
 	//Serial1.begin(115200);
 	Serial1.begin(57600);
@@ -106,6 +115,7 @@ void loop() {
 			flashstate1=1;
 		}
 		digitalWrite(boardLEDPin,flashstate1);
+		Serial.print("freeRam: "); Serial.println(freeRam());
 		flashingTimer1=millis();
 	}
 	

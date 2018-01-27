@@ -49,20 +49,22 @@ const int reversvalue [numberOfValues] = {
 
 const int servopin[numberOfValues] = { 
 /*Valve A*/  1,
-/*Valve B*/  1,
-/*Valve C*/  0,
+/*Valve B*/  0,
+/*Valve C*/  1,
 /*Valve D*/  0,
 /*Valve E*/  0,
 /*Valve A2*/ 0,
 
 };
 
-Servo servoA;
-Servo servoB;
 
-Servo servoObj[numberOfValues]={
-servoA,
-	servoB,
+Servo * servoObj[numberOfValues]={
+NULL,
+NULL,
+NULL,
+NULL,
+NULL,
+NULL,
 
 };
 
@@ -209,7 +211,13 @@ void StateMachineClass::EnableStateMachine( ) {
 		if (servopin[valveII] == 0 ){
 			pinMode(ValvePins[valveII],OUTPUT);
 	 	}else{
-			servoObj[valveII].attach(ValvePins[valveII]);
+			if (servoObj[valveII]){
+			    servoObj[valveII]->attach(ValvePins[valveII]);
+			}else{
+					Servo * tmpPointer = new Servo;
+					servoObj[valveII] = tmpPointer;
+					servoObj[valveII]->attach(ValvePins[valveII]);
+			}
 	 	}
 	}
 //for( int valveII = 0; valveII < numberOfValues; valveII += 1 ) {
@@ -458,7 +466,7 @@ void StateMachineClass::setMachineState( int NewState ) {
 		if (servopin[valveII] == 0 ){
 			digitalWrite(ValvePins[valveII],PinVal);
 		}else{
-			servoObj[valveII].write(100*PinVal);
+			servoObj[valveII]->write(100*PinVal);
 		}
 	}
 	
