@@ -57,18 +57,7 @@ const int servopin[numberOfValues] = {
 
 };
 
-
-Servo * servoObj[numberOfValues]={
-NULL,
-NULL,
-NULL,
-NULL,
-NULL,
-NULL,
-
-};
-
-
+Servo * servoObj[numberOfValues]={0};//please dont change.
 
 //state stuff
 const int numberofStates=9;
@@ -210,6 +199,10 @@ void StateMachineClass::EnableStateMachine( ) {
 		//digitalWrite(ValvePins[valveII],ValueState[NewState][valveII]);
 		if (servopin[valveII] == 0 ){
 			pinMode(ValvePins[valveII],OUTPUT);
+/*			servopin is const array so we never need to do this.
+ *      if (servoObj[valveII]){
+ *				servoObj[valveII]->detach();
+ *			}*/
 	 	}else{
 			if (servoObj[valveII]){
 			    servoObj[valveII]->attach(ValvePins[valveII]);
