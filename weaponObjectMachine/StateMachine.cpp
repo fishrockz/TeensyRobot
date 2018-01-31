@@ -20,15 +20,15 @@ const int numberOfValues=6;
 	/*Valve C*/  21,
 	/*Valve D*/  5,
 	/*Valve E*/  6,
-	/*Valve A2*/  37
+	/*Valve A2*/  37,
 	// /*Aux1 */    36
 	// /*Aux1 */    38
 	};
 #else 
 	/* Doug's pinout*/
 	const int ValvePins[numberOfValues] = {
-	/*Valve A*/  4,
-	/*Valve B*/  5,
+	/*Valve A*/  14,  //4
+	/*Valve B*/  15, //5
 	/*Valve C*/  6,
 	/*Valve D*/  7,
 	/*Valve E*/  8,
@@ -49,8 +49,8 @@ const int reversvalue [numberOfValues] = {
 
 const boolean servopin[numberOfValues] = { 
 /*Valve A*/  1,
-/*Valve B*/  0,
-/*Valve C*/  1,
+/*Valve B*/  1,
+/*Valve C*/  0,
 /*Valve D*/  0,
 /*Valve E*/  0,
 /*Valve A2*/ 0,
@@ -134,27 +134,27 @@ const int StateLeadinTimes[numberofStates] = {
 };
 
 const int StateMinTimes[numberofStates] = { 
-/* Safe State */		        10000, 
-/* Retract/fill Buffer */	 700000, // 0.5 or 1 seconds??
-/* Retract wait */	    	5000000, // 4 seconds of expansion
-/* Rest */			            10000, 
-/* Arming */			          10000, 
-/* Ready to Fire */		      10000,
-/* Waiting to Fire */		    10000,
-/* Fire */			           500000, // 0.5 to 1 second
-/* Fired */			          1000000,
+/* Safe State */            10000, 
+/* Retract/fill Buffer */  400000, // 0.4seconds
+/* Retract wait */         800000, // 0.8 seconds of expansion
+/* Rest */                  10000, 
+/* Arming */                10000, 
+/* Ready to Fire */         10000,
+/* Waiting to Fire */       10000,
+/* Fire */                 800000, // waits 0.8 sec before venting chamber after firing?
+/* Fired */               1000000, // 1s venting duration
 };
 
 const int StateAutoTransitionTimes[numberofStates] = { 
-/* Safe State */		        10000, 
-/* Retract/fill Buffer */ 	10000, 
-/* Retract wait */	       	10000, 
-/* Rest */			            10000, 
-/* Arming */			        3000000, // 5 seconds
-/* Ready to Fire */		      200000, // 7 seconds
-/* Waiting to Fire */		    10000,
-/* Fire */			            10000,
-/* Fired */			            10000,
+/* Safe State */            10000, 
+/* Retract/fill Buffer */   10000, 
+/* Retract wait */          10000, 
+/* Rest */                  10000, 
+/* Arming */              2000000, // 2 seconds fill
+/* Ready to Fire */         10000, // 0.01 seconds
+/* Waiting to Fire */       10000,
+/* Fire */                  10000,
+/* Fired */                 10000,
 };
 
 
@@ -415,8 +415,8 @@ void StateMachineClass::tickFunction(void ){
 			
 				printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
 												
-				Sensor1=readPressureSensor(3);
-				Sensor2=readPressureSensor(2);
+				//Sensor1=readPressureSensor(3);
+				//Sensor2=readPressureSensor(2);
 						
 				debugFunction();
 			
