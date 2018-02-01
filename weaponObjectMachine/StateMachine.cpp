@@ -415,8 +415,8 @@ void StateMachineClass::tickFunction(void ){
 			
 				printer->println("StateMachineClass::tickFunction Telemetry mode code goes here");
 												
-				//Sensor1=readPressureSensor(3);
-				//Sensor2=readPressureSensor(2);
+				//Sensor1=readPressureSensor(3);// these are not analog pins!! did i mean A3?
+				//Sensor2=readPressureSensor(2);// these are not analog pins!! did i mean A2?
 						
 				debugFunction();
 			
