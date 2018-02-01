@@ -393,7 +393,7 @@ void StateMachineClass::debugFunction(HardwareSerial MySerial ){
 
 float readPressureSensor(int pin){
 
-	int val = analogRead(2);
+	int val = analogRead(pin);
 	// 5 122
 	// 2.5 96
 	// minimum seen: 20
